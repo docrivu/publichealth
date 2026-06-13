@@ -1,0 +1,112 @@
+
+<style id="phfy-contact-style">
+.phfy-contact-page{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324a;background:linear-gradient(180deg,#f3f8fd 0%,#fff 46%,#eef7ff 100%);padding:0 0 3rem;margin:0 calc(50% - 50vw);width:100vw;}
+.phfy-contact-page *{box-sizing:border-box;}
+.phfy-contact-wrap{max-width:1120px;margin:0 auto;padding:clamp(1rem,3vw,2rem);}
+.phfy-contact-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:clamp(1.2rem,4vw,3rem);align-items:center;padding:clamp(2rem,6vw,4.6rem) 0 1.5rem;}
+.phfy-contact-kicker{display:inline-flex;align-items:center;gap:.45rem;background:#dff0ff;color:#0b558a;border:1px solid #b9def7;border-radius:999px;padding:.45rem .8rem;font-size:.86rem;font-weight:800;letter-spacing:.02em;text-transform:uppercase;}
+.phfy-contact-hero h1{font-size:clamp(2.25rem,6vw,4.8rem);line-height:1.02;margin:.85rem 0 1rem;color:#082f52;letter-spacing:0;}
+.phfy-contact-hero p{font-size:clamp(1.03rem,2vw,1.22rem);line-height:1.75;margin:0;color:#2f526e;max-width:68ch;}
+.phfy-contact-panel{background:#fff;border:1px solid #cbe2f5;border-radius:8px;box-shadow:0 24px 56px rgba(23,105,170,.14);padding:clamp(1.1rem,3vw,1.7rem);}
+.phfy-contact-panel h2,.phfy-form-card h2{font-size:clamp(1.35rem,2.4vw,2rem);line-height:1.18;color:#0b3d66;margin:0 0 .75rem;}
+.phfy-contact-panel p{margin:0 0 1rem;color:#3a5d78;line-height:1.65;}
+.phfy-contact-steps{display:grid;gap:.85rem;margin-top:1rem;}
+.phfy-contact-step{display:grid;grid-template-columns:2.2rem minmax(0,1fr);gap:.8rem;align-items:start;padding:.85rem;border:1px solid #d7eafa;border-radius:8px;background:#f7fbff;}
+.phfy-contact-step strong{display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:50%;background:#1769aa;color:#fff;font-size:.92rem;}
+.phfy-contact-step span{color:#244962;line-height:1.55;}
+.phfy-contact-grid{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(1rem,3vw,1.5rem);align-items:start;margin-top:1.5rem;}
+.phfy-contact-card,.phfy-form-card{background:#fff;border:1px solid #cbe2f5;border-radius:8px;box-shadow:0 18px 42px rgba(11,61,102,.09);padding:clamp(1rem,2.5vw,1.55rem);}
+.phfy-contact-card h3{font-size:1.15rem;line-height:1.25;margin:0 0 .65rem;color:#0b3d66;}
+.phfy-contact-card p{margin:0 0 1rem;color:#365b76;line-height:1.65;}
+.phfy-contact-links{display:grid;gap:.75rem;margin-top:1rem;}
+.phfy-contact-links a{display:flex;align-items:center;justify-content:space-between;gap:.75rem;text-decoration:none;border:1px solid #b9def7;background:#f2f9ff;color:#0b4f82;border-radius:8px;padding:.85rem 1rem;font-weight:800;}
+.phfy-contact-links a:hover{background:#1769aa;color:#fff;border-color:#1769aa;}
+.phfy-form-note{border-left:4px solid #1769aa;background:#eef7ff;padding:.9rem 1rem;border-radius:0 8px 8px 0;color:#284f6b;line-height:1.6;margin:0 0 1.1rem;}
+.phfy-form-card .wpforms-container{margin:0!important;}
+.phfy-form-card .wpforms-field-label{color:#0b3d66!important;font-weight:800!important;}
+.phfy-form-card input,.phfy-form-card textarea,.phfy-form-card select{border:1px solid #b8d7ee!important;border-radius:8px!important;background:#fbfdff!important;color:#18324a!important;box-shadow:none!important;min-height:46px;}
+.phfy-form-card textarea{min-height:150px!important;}
+.phfy-form-card button[type=submit],.phfy-form-card .wpforms-submit{background:#1769aa!important;color:#fff!important;border:0!important;border-radius:8px!important;padding:.85rem 1.25rem!important;font-weight:900!important;box-shadow:0 12px 26px rgba(23,105,170,.22)!important;}
+.phfy-form-card button[type=submit]:hover,.phfy-form-card .wpforms-submit:hover{background:#0b3d66!important;}
+@media (max-width:820px){.phfy-contact-hero,.phfy-contact-grid{grid-template-columns:1fr;}.phfy-contact-hero{padding-top:2rem;}.phfy-contact-page{margin:0 calc(50% - 50vw);}.phfy-contact-links a{align-items:flex-start;flex-direction:column;}.phfy-contact-step{grid-template-columns:1.9rem minmax(0,1fr);}.phfy-contact-step strong{width:1.9rem;height:1.9rem;}}
+</style>
+<style id="phfy-contact-captcha-style">
+.phfy-captcha-check{margin:1rem 0 1.1rem;padding:1rem;border:1px solid #b9def7;background:#f2f9ff;border-radius:8px;color:#244962;}
+.phfy-captcha-check label{display:block;font-weight:800;color:#0b3d66;margin:0 0 .55rem;}
+.phfy-captcha-row{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;}
+.phfy-captcha-question{font-weight:900;color:#0b3d66;background:#fff;border:1px solid #cbe2f5;border-radius:8px;padding:.75rem .9rem;min-width:8rem;text-align:center;}
+.phfy-captcha-check input{max-width:10rem;border:1px solid #b8d7ee!important;border-radius:8px!important;background:#fff!important;min-height:44px;padding:.55rem .75rem;}
+.phfy-captcha-help{display:block;margin-top:.5rem;font-size:.92rem;line-height:1.45;color:#496a82;}
+.phfy-captcha-error{display:none;margin-top:.65rem;color:#9a3412;font-weight:800;}
+.phfy-captcha-check.is-invalid .phfy-captcha-error{display:block;}
+.phfy-form-card .wpforms-submit[disabled]{opacity:.55!important;cursor:not-allowed!important;box-shadow:none!important;}
+@media (max-width:560px){.phfy-captcha-row{align-items:stretch;}.phfy-captcha-question,.phfy-captcha-check input{width:100%;max-width:none;}}
+</style>
+<div class="phfy-contact-page">
+  <div class="phfy-contact-wrap">
+    <section class="phfy-contact-hero">
+      <div>
+        <span class="phfy-contact-kicker">Contact Rivu Basu</span>
+        <h1>Ask a public health query</h1>
+        <p>Use this page to send questions about the site, tools, public health education material, epidemiology, biostatistics, nutrition calculators, games, or collaborations. Please include a working email address so the reply can reach you safely.</p>
+      </div>
+      <aside class="phfy-contact-panel">
+        <h2>How your request is handled</h2>
+        <p>Queries submitted through the form are routed to <strong>rivubasu83@gmail.com</strong>.</p>
+        <div class="phfy-contact-steps">
+          <div class="phfy-contact-step"><strong>1</strong><span>Enter your name, email address, and question with enough context for a useful reply.</span></div>
+          <div class="phfy-contact-step"><strong>2</strong><span>The query is sent to the site owner for review and response.</span></div>
+          <div class="phfy-contact-step"><strong>3</strong><span>Email OTP verification can be enabled after an OTP-capable form add-on or custom backend is connected.</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="phfy-contact-grid">
+      <aside class="phfy-contact-card">
+        <h3>Best for</h3>
+        <p>Questions about calculators, growth charts, nutrition, statistics, infectious disease models, learning resources, and public health communication.</p>
+        <h3>Direct contact</h3>
+        <p>If the form is unavailable, use the direct email link below.</p>
+        <div class="phfy-contact-links">
+          <a href="mailto:rivubasu83@gmail.com?subject=Query%20from%20Public%20Health%20for%20You">Email rivubasu83@gmail.com <span aria-hidden="true">→</span></a>
+          <a href="https://www.facebook.com/rivu.basu.2025" target="_blank" rel="noopener">Facebook <span aria-hidden="true">→</span></a>
+          <a href="https://www.linkedin.com/in/rivu-basu-05042b7a/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">→</span></a>
+          <a href="https://www.youtube.com/@rivu1983" target="_blank" rel="noopener">YouTube <span aria-hidden="true">→</span></a>
+        </div>
+      </aside>
+      <div class="phfy-form-card">
+        <h2>Send your query</h2>
+        <p class="phfy-form-note">Use an email address you can access. Your query will be routed to the site owner, and replies will be sent to the email address you provide.</p>
+        [wpforms id="180" title="false"]
+      </div>
+    </section>
+  </div>
+</div>
+
+<script id="phfy-contact-captcha-script">
+(function(){
+  function ready(fn){ if(document.readyState!=='loading'){fn();} else {document.addEventListener('DOMContentLoaded',fn);} }
+  ready(function(){
+    var form=document.querySelector('#wpforms-form-180');
+    if(!form || form.querySelector('.phfy-captcha-check')) return;
+    var submit=form.querySelector('button[type="submit"], input[type="submit"], .wpforms-submit');
+    var a=Math.floor(Math.random()*6)+3;
+    var b=Math.floor(Math.random()*6)+2;
+    var answer=String(a+b);
+    var box=document.createElement('div');
+    box.className='phfy-captcha-check is-invalid';
+    box.innerHTML='<label for="phfy-captcha-answer">CAPTCHA check</label><div class="phfy-captcha-row"><span class="phfy-captcha-question">'+a+' + '+b+' = ?</span><input id="phfy-captcha-answer" name="phfy_captcha_answer" inputmode="numeric" autocomplete="off" placeholder="Answer" aria-describedby="phfy-captcha-help phfy-captcha-error"></div><span id="phfy-captcha-help" class="phfy-captcha-help">Please answer this simple check before submitting your query.</span><span id="phfy-captcha-error" class="phfy-captcha-error">Please enter the correct answer to continue.</span>';
+    if(submit && submit.parentNode){ submit.parentNode.insertBefore(box, submit); }
+    var input=box.querySelector('input');
+    function validate(){
+      var ok=input.value.trim()===answer;
+      box.classList.toggle('is-invalid',!ok);
+      if(submit){ submit.disabled=!ok; submit.setAttribute('aria-disabled', String(!ok)); }
+      return ok;
+    }
+    validate();
+    input.addEventListener('input',validate);
+    form.addEventListener('submit',function(e){ if(!validate()){ e.preventDefault(); e.stopPropagation(); input.focus(); }}, true);
+  });
+})();
+</script>

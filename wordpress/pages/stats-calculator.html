@@ -1,0 +1,1396 @@
+<!-- wp:html -->
+<section class="phfy-tool-intro">
+  <p class="phfy-tool-kicker">Hypothesis Testing Tool</p>
+  <h1>Stats Calculator</h1>
+  <p>A guided statistics workspace that explains common hypothesis tests step by step. Use it to compare values, calculate test statistics, review p-values, and understand the decision in plain language.</p>
+  <div class="phfy-tool-meta">
+    <div><b>Best for</b>Z tests, t tests, chi-square, and common teaching examples</div>
+    <div><b>What it gives</b>Statistic, p-value, decision, and worked steps</div>
+    <div><b>Audience</b>Students, teachers, and researchers</div>
+  </div>
+</section>
+<style id="phfy-direct-tool-intro-style">
+.phfy-tool-intro{width:min(1040px,calc(100vw - 32px));margin:clamp(1.25rem,4vw,2.5rem) auto 1rem;padding:clamp(1.2rem,4vw,2.35rem);border:1px solid #d7e4f2;border-radius:20px;background:radial-gradient(circle at top right,rgba(91,183,223,.22),transparent 34%),linear-gradient(135deg,#f6faff,#fff);box-shadow:0 18px 55px rgba(16,32,51,.11);color:#102033}.phfy-tool-kicker{color:#1769aa;font-family:var(--wp--preset--font-family--beiruti),Arial,sans-serif;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin:0 0 .55rem}.phfy-tool-intro h1{color:#0b3d66!important;font-size:clamp(2rem,6vw,4.2rem);line-height:1;margin:0}.phfy-tool-intro p{color:#536476!important;font-size:clamp(1.02rem,1.7vw,1.2rem);line-height:1.65;margin:.85rem 0 0;max-width:820px}.phfy-tool-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-top:1rem}.phfy-tool-meta div{background:#fff;border:1px solid #d7e4f2;border-radius:14px;padding:.85rem;color:#536476}.phfy-tool-meta b{display:block;color:#0b3d66;margin-bottom:.25rem}@media(max-width:781px){.phfy-tool-intro{width:min(100vw - 16px,100%);border-radius:12px}.phfy-tool-meta{grid-template-columns:1fr}.phfy-tool-intro h1{font-size:clamp(1.75rem,8vw,2.6rem)}}
+</style>
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hypothesis Testing Steps</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --ink: #182433;
+      --muted: #334155;
+      --line: #d7dfeb;
+      --tab: #eaf0fb;
+      --tab-active: #2457c5;
+      --tab-active-ink: #ffffff;
+      --step-bg: #f0f4fa;
+      --accent-soft: #dce9ff;
+      --good: #1e8a4b;
+      --bad: #c13d3d;
+      --shadow: 0 18px 42px rgba(22, 35, 56, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(36, 87, 197, 0.08), transparent 24%),
+        linear-gradient(180deg, #f8fbff, var(--bg));
+    }
+
+    .page {
+      width: min(1180px, calc(100vw - 24px));
+      margin: 0 auto;
+      padding: 20px 0 28px;
+    }
+
+    .shell {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 20px 20px 12px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(36, 87, 197, 0.06), rgba(36, 87, 197, 0)),
+        #fff;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      line-height: 1;
+    }
+
+    .subtext {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 20px 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .overview {
+      padding: 14px 20px 4px;
+    }
+
+    .overview-head {
+      margin: 0 0 10px;
+      font-size: 1.15rem;
+    }
+
+    .accordion {
+      display: grid;
+      gap: 10px;
+    }
+
+    .accordion-item {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .accordion-toggle {
+      width: 100%;
+      appearance: none;
+      border: 0;
+      background: var(--accent-soft);
+      color: var(--ink);
+      text-align: left;
+      padding: 14px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .accordion-toggle::after {
+      content: "+";
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .accordion-item.open .accordion-toggle::after {
+      content: "−";
+    }
+
+    .accordion-content {
+      display: none;
+      padding: 14px 16px 16px;
+      color: #243244;
+      line-height: 1.6;
+      background: #fff;
+    }
+
+    .accordion-item.open .accordion-content {
+      display: block;
+    }
+
+    .tab {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 14px;
+      min-height: 44px;
+      background: var(--tab);
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .tab:hover {
+      transform: translateY(-1px);
+    }
+
+    .tab.active {
+      background: var(--tab-active);
+      color: var(--tab-active-ink);
+    }
+
+    .table-wrap {
+      padding: 16px 20px 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      min-width: 620px;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 14px 12px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.45;
+    }
+
+    th {
+      background: #edf3fb;
+      font-size: 0.97rem;
+    }
+
+    .step-col {
+      width: 34%;
+      background: var(--step-bg);
+      font-weight: 700;
+    }
+
+    .detail-col {
+      width: 66%;
+    }
+
+    .cell-label {
+      display: none;
+      margin-bottom: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .calculator {
+      margin: 14px 20px 20px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(36, 87, 197, 0.04), rgba(36, 87, 197, 0));
+    }
+
+    .calculator-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .calculator-header p {
+      margin: 6px 0 0;
+      color: #2d3f55;
+      line-height: 1.5;
+    }
+
+    .calc-layout {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+    }
+
+    .input-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .field-note {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.4;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-height: 44px;
+      font: inherit;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button.action {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      min-height: 44px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      background: #2457c5;
+    }
+
+    button.action.secondary {
+      color: var(--ink);
+      background: #eaf0fb;
+    }
+
+    .result-panel {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .result-summary {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      padding: 14px;
+      background: var(--accent-soft);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .result-box strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #2d3f55;
+    }
+
+    .result-box span {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .decision {
+      padding: 14px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .decision.good {
+      color: var(--good);
+    }
+
+    .decision.bad {
+      color: var(--bad);
+    }
+
+    .steps {
+      margin: 0;
+      padding: 14px 18px 18px 34px;
+      line-height: 1.55;
+    }
+
+    .steps li + li {
+      margin-top: 10px;
+    }
+
+    .inline-math {
+      font-family: "Courier New", monospace;
+      font-size: 0.94rem;
+    }
+
+    .hint {
+      padding: 0 20px 18px;
+      color: #2d3f55;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 860px) {
+      .calc-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        width: min(100vw - 8px, 100%);
+        padding-top: 8px;
+      }
+
+      .hero,
+      .overview,
+      .tabs,
+      .table-wrap,
+      .hint {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .calculator {
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 12px;
+        border-radius: 18px;
+      }
+
+      th,
+      td {
+        padding: 10px 8px;
+        font-size: 0.9rem;
+      }
+
+      .step-col {
+        width: 44%;
+      }
+
+      .detail-col {
+        width: 56%;
+      }
+
+      .hero {
+        padding-top: 16px;
+        padding-bottom: 10px;
+      }
+
+      h1 {
+        font-size: 1.55rem;
+        line-height: 1.08;
+      }
+
+      .subtext,
+      .calculator-header p,
+      .accordion-content,
+      .hint {
+        font-size: 0.92rem;
+      }
+
+      .overview {
+        padding-top: 12px;
+      }
+
+      .overview-head {
+        font-size: 1rem;
+      }
+
+      .accordion {
+        gap: 8px;
+      }
+
+      .accordion-toggle {
+        padding: 12px 14px;
+        min-height: 48px;
+        font-size: 0.95rem;
+      }
+
+      .accordion-content {
+        padding: 12px 14px 14px;
+      }
+
+      .tabs {
+        flex-wrap: nowrap;
+        gap: 8px;
+        padding-top: 12px;
+        padding-bottom: 2px;
+      }
+
+      .tab {
+        padding: 10px 13px;
+        font-size: 0.9rem;
+      }
+
+      .table-wrap {
+        padding-top: 12px;
+        overflow-x: visible;
+      }
+
+      table {
+        min-width: 0;
+      }
+
+      .calculator-header {
+        margin-bottom: 12px;
+      }
+
+      .calculator-header h2 {
+        font-size: 1.1rem;
+      }
+
+      .input-grid,
+      .result-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .result-panel {
+        border-radius: 16px;
+      }
+
+      .result-summary {
+        padding: 12px;
+      }
+
+      .decision {
+        padding: 12px;
+        font-size: 0.95rem;
+      }
+
+      .steps {
+        padding: 12px 14px 16px 28px;
+        font-size: 0.92rem;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tbody {
+        display: grid;
+        gap: 10px;
+      }
+
+      tr {
+        display: grid;
+        gap: 0;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      td {
+        display: block;
+        width: 100%;
+        border: 0;
+      }
+
+      td + td {
+        border-top: 1px solid var(--line);
+      }
+
+      .step-col,
+      .detail-col {
+        width: 100%;
+      }
+
+      .step-col {
+        background: var(--step-bg);
+      }
+
+      .detail-col {
+        background: #fff;
+      }
+
+      .cell-label {
+        display: block;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .page {
+        width: 100%;
+      }
+
+      .shell {
+        border-radius: 16px;
+      }
+
+      .hero,
+      .overview,
+      .tabs,
+      .table-wrap,
+      .hint {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      .calculator {
+        margin-left: 8px;
+        margin-right: 8px;
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+      }
+
+      table {
+        min-width: 500px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="shell">
+      <header class="hero">
+        <h1>Rivu Basu Stats Calculator</h1>
+        <p class="subtext">
+          The first column stays fixed as the step list. Click a test tab to view that column beside it, then use the calculator below for a worked significance test.
+        </p>
+      </header>
+
+      <section class="overview">
+        <h2 class="overview-head">General Steps of Hypothesis Testing</h2>
+        <div class="accordion" id="overviewAccordion"></div>
+      </section>
+
+      <nav class="tabs" id="tabs" aria-label="Hypothesis test types"></nav>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="step-col" id="stepHeader">Step</th>
+              <th class="detail-col" id="detailHeader"></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <section class="calculator">
+        <div class="calculator-header">
+          <div>
+            <h2 id="calculatorTitle">Calculator</h2>
+            <p id="calculatorIntro"></p>
+          </div>
+        </div>
+
+        <div class="calc-layout">
+          <div>
+            <form id="calculatorForm">
+              <div class="input-grid" id="inputGrid"></div>
+              <div class="actions">
+                <button type="submit" class="action">Run Test</button>
+                <button type="button" class="action secondary" id="resetCalcButton">Clear Inputs</button>
+              </div>
+            </form>
+          </div>
+
+          <section class="result-panel">
+            <div class="result-summary">
+              <div class="result-box">
+                <strong>Statistic</strong>
+                <span id="statisticValue">-</span>
+              </div>
+              <div class="result-box">
+                <strong>p-value</strong>
+                <span id="pValue">-</span>
+              </div>
+              <div class="result-box">
+                <strong>Alpha</strong>
+                <span id="alphaValue">-</span>
+              </div>
+            </div>
+            <div class="decision" id="decisionText">Fill the calculator inputs and click Run Test.</div>
+            <ol class="steps" id="stepsOutput"></ol>
+          </section>
+        </div>
+      </section>
+
+      <p class="hint">Tip: the calculator shows the hypothesis, statistic, p-value, and decision step by step for the selected tab.</p>
+    </section>
+  </main>
+
+  <script>
+    const tableData = {
+      stepHeader: "Step",
+      columns: [
+        {
+          id: "z-proportion",
+          title: "Z test (Population Proportion)",
+          intro: "Use this for a single sample proportion compared with a hypothesized population proportion.",
+          rows: [
+            { step: "Step 1: Formulate hypotheses", value: "H0: p = p0; H1: p ≠ p0" },
+            { step: "Step 2: Choose α", value: "Usually 0.05" },
+            { step: "Step 3: Select test", value: "Z test for single proportion" },
+            { step: "Step 4: Calculate test statistic", value: "Z = (p - p0)/sqrt(p0(1-p0)/n)" },
+            { step: "Step 5: Determine p-value", value: "From Z table" },
+            { step: "Step 6: Decision", value: "Reject H0 if p ≤ α" },
+            { step: "Step 7: Interpretation", value: "Conclusion about proportion" }
+          ],
+          fields: [
+            { key: "x", label: "Observed frequency", step: "1", min: "0", placeholder: "e.g. 56" },
+            { key: "n", label: "Sample size (n)", step: "1", min: "1", placeholder: "e.g. 100" },
+            { key: "p0", label: "Hypothesized proportion (p0)", step: "0.001", min: "0", max: "1", placeholder: "e.g. 0.5" },
+            { key: "alpha", label: "Significance level (α)", step: "0.001", min: "0.001", max: "0.2", value: "0.05" }
+          ],
+          compute(values) {
+            const pHat = values.x / values.n;
+            const se = Math.sqrt((values.p0 * (1 - values.p0)) / values.n);
+            const z = (pHat - values.p0) / se;
+            const pValue = 2 * (1 - normalCDF(Math.abs(z)));
+            return {
+              statisticLabel: "Z",
+              statistic: z,
+              pValue,
+              alpha: values.alpha,
+              reject: pValue <= values.alpha,
+              steps: [
+                `State hypotheses: H0: p = ${format(values.p0)} and H1: p ≠ ${format(values.p0)}.`,
+                `Compute sample proportion: frequency/n = ${values.x}/${values.n} = ${format(pHat)}.`,
+                `Standard error under H0: sqrt(p0(1-p0)/n) = ${format(se)}.`,
+                `Test statistic: <span class="inline-math">Z = (p̂ - p0)/SE = (${format(pHat)} - ${format(values.p0)})/${format(se)} = ${format(z)}</span>.`,
+                `Two-sided p-value from the Z distribution: ${format(pValue)}.`,
+                `Decision at α = ${format(values.alpha)}: ${pValue <= values.alpha ? "Reject H0" : "Fail to reject H0"}.`,
+                `${pValue <= values.alpha ? "The sample proportion differs significantly from the hypothesized proportion." : "There is not enough evidence that the population proportion differs from the hypothesized value."}`
+              ]
+            };
+          }
+        },
+        {
+          id: "t-mean",
+          title: "t test (Population Mean)",
+          intro: "Use this for a single sample mean compared with a hypothesized population mean when the population standard deviation is unknown.",
+          rows: [
+            { step: "Step 1: Formulate hypotheses", value: "H0: μ = μ0; H1: μ ≠ μ0" },
+            { step: "Step 2: Choose α", value: "Usually 0.05" },
+            { step: "Step 3: Select test", value: "One-sample t test" },
+            { step: "Step 4: Calculate test statistic", value: "t = (x̄ - μ0)/(s/sqrt(n))" },
+            { step: "Step 5: Determine p-value", value: "From t table (df=n-1)" },
+            { step: "Step 6: Decision", value: "Reject H0 if p ≤ α" },
+            { step: "Step 7: Interpretation", value: "Conclusion about mean" }
+          ],
+          fields: [
+            { key: "mean", label: "Sample mean (x̄)", step: "0.001", placeholder: "e.g. 52.4" },
+            { key: "mu0", label: "Hypothesized mean (μ0)", step: "0.001", placeholder: "e.g. 50" },
+            { key: "sd", label: "Sample SD (s)", step: "0.001", min: "0.0001", placeholder: "e.g. 8.2" },
+            { key: "n", label: "Sample size (n)", step: "1", min: "2", placeholder: "e.g. 25" },
+            { key: "alpha", label: "Significance level (α)", step: "0.001", min: "0.001", max: "0.2", value: "0.05" }
+          ],
+          compute(values) {
+            const se = values.sd / Math.sqrt(values.n);
+            const t = (values.mean - values.mu0) / se;
+            const df = values.n - 1;
+            const pValue = 2 * (1 - studentTCDF(Math.abs(t), df));
+            return {
+              statisticLabel: "t",
+              statistic: t,
+              pValue,
+              alpha: values.alpha,
+              reject: pValue <= values.alpha,
+              steps: [
+                `State hypotheses: H0: μ = ${format(values.mu0)} and H1: μ ≠ ${format(values.mu0)}.`,
+                `Degrees of freedom: n - 1 = ${values.n} - 1 = ${df}.`,
+                `Standard error: s/sqrt(n) = ${format(values.sd)}/sqrt(${values.n}) = ${format(se)}.`,
+                `Test statistic: <span class="inline-math">t = (x̄ - μ0)/SE = (${format(values.mean)} - ${format(values.mu0)})/${format(se)} = ${format(t)}</span>.`,
+                `Two-sided p-value from the t distribution with df = ${df}: ${format(pValue)}.`,
+                `Decision at α = ${format(values.alpha)}: ${pValue <= values.alpha ? "Reject H0" : "Fail to reject H0"}.`,
+                `${pValue <= values.alpha ? "The sample mean differs significantly from the hypothesized population mean." : "There is not enough evidence that the population mean differs from the hypothesized value."}`
+              ]
+            };
+          }
+        },
+        {
+          id: "z-diff-proportion",
+          title: "Z test (Difference in Proportions)",
+          intro: "Use this to compare two independent sample proportions.",
+          rows: [
+            { step: "Step 1: Formulate hypotheses", value: "H0: p1 = p2; H1: p1 ≠ p2" },
+            { step: "Step 2: Choose α", value: "Usually 0.05" },
+            { step: "Step 3: Select test", value: "Z test for two proportions" },
+            { step: "Step 4: Calculate test statistic", value: "Z = (p1 - p2)/sqrt(p(1-p)(1/n1+1/n2))" },
+            { step: "Step 5: Determine p-value", value: "From Z table" },
+            { step: "Step 6: Decision", value: "Reject H0 if p ≤ α" },
+            { step: "Step 7: Interpretation", value: "Conclusion about proportions" }
+          ],
+          fields: [
+            { key: "x1", label: "Group 1 frequency", step: "1", min: "0", placeholder: "e.g. 42" },
+            { key: "n1", label: "Group 1 size (n1)", step: "1", min: "1", placeholder: "e.g. 80" },
+            { key: "x2", label: "Group 2 frequency", step: "1", min: "0", placeholder: "e.g. 31" },
+            { key: "n2", label: "Group 2 size (n2)", step: "1", min: "1", placeholder: "e.g. 75" },
+            { key: "alpha", label: "Significance level (α)", step: "0.001", min: "0.001", max: "0.2", value: "0.05" }
+          ],
+          compute(values) {
+            const p1 = values.x1 / values.n1;
+            const p2 = values.x2 / values.n2;
+            const pooled = (values.x1 + values.x2) / (values.n1 + values.n2);
+            const se = Math.sqrt(pooled * (1 - pooled) * ((1 / values.n1) + (1 / values.n2)));
+            const z = (p1 - p2) / se;
+            const pValue = 2 * (1 - normalCDF(Math.abs(z)));
+            return {
+              statisticLabel: "Z",
+              statistic: z,
+              pValue,
+              alpha: values.alpha,
+              reject: pValue <= values.alpha,
+              steps: [
+                `State hypotheses: H0: p1 = p2 and H1: p1 ≠ p2.`,
+                `Compute sample proportions: p1 = ${values.x1}/${values.n1} = ${format(p1)} and p2 = ${values.x2}/${values.n2} = ${format(p2)}.`,
+                `Compute pooled proportion: p = (frequency1 + frequency2)/(n1 + n2) = ${format(pooled)}.`,
+                `Standard error: sqrt[p(1-p)(1/n1 + 1/n2)] = ${format(se)}.`,
+                `Test statistic: <span class="inline-math">Z = (p1 - p2)/SE = (${format(p1)} - ${format(p2)})/${format(se)} = ${format(z)}</span>.`,
+                `Two-sided p-value from the Z distribution: ${format(pValue)}.`,
+                `Decision at α = ${format(values.alpha)}: ${pValue <= values.alpha ? "Reject H0" : "Fail to reject H0"}.`,
+                `${pValue <= values.alpha ? "The two proportions are significantly different." : "There is not enough evidence that the two population proportions differ."}`
+              ]
+            };
+          }
+        },
+        {
+          id: "unpaired-t",
+          title: "Unpaired t test (Difference in Means)",
+          intro: "Use this for two independent sample means. This calculator uses the Welch version, which is the safer default when variances may differ.",
+          rows: [
+            { step: "Step 1: Formulate hypotheses", value: "H0: μ1 = μ2; H1: μ1 ≠ μ2" },
+            { step: "Step 2: Choose α", value: "Usually 0.05" },
+            { step: "Step 3: Select test", value: "Independent t test" },
+            { step: "Step 4: Calculate test statistic", value: "t = (x̄1 - x̄2)/SE" },
+            { step: "Step 5: Determine p-value", value: "From t table" },
+            { step: "Step 6: Decision", value: "Reject H0 if p ≤ α" },
+            { step: "Step 7: Interpretation", value: "Conclusion about means" }
+          ],
+          fields: [
+            { key: "mean1", label: "Group 1 mean (x̄1)", step: "0.001", placeholder: "e.g. 23.4" },
+            { key: "sd1", label: "Group 1 SD (s1)", step: "0.001", min: "0.0001", placeholder: "e.g. 5.2" },
+            { key: "n1", label: "Group 1 size (n1)", step: "1", min: "2", placeholder: "e.g. 18" },
+            { key: "mean2", label: "Group 2 mean (x̄2)", step: "0.001", placeholder: "e.g. 19.1" },
+            { key: "sd2", label: "Group 2 SD (s2)", step: "0.001", min: "0.0001", placeholder: "e.g. 4.8" },
+            { key: "n2", label: "Group 2 size (n2)", step: "1", min: "2", placeholder: "e.g. 20" },
+            { key: "alpha", label: "Significance level (α)", step: "0.001", min: "0.001", max: "0.2", value: "0.05" }
+          ],
+          compute(values) {
+            const var1 = (values.sd1 ** 2) / values.n1;
+            const var2 = (values.sd2 ** 2) / values.n2;
+            const se = Math.sqrt(var1 + var2);
+            const t = (values.mean1 - values.mean2) / se;
+            const dfNumerator = (var1 + var2) ** 2;
+            const dfDenominator = ((var1 ** 2) / (values.n1 - 1)) + ((var2 ** 2) / (values.n2 - 1));
+            const df = dfNumerator / dfDenominator;
+            const pValue = 2 * (1 - studentTCDF(Math.abs(t), df));
+            return {
+              statisticLabel: "t",
+              statistic: t,
+              pValue,
+              alpha: values.alpha,
+              reject: pValue <= values.alpha,
+              steps: [
+                `State hypotheses: H0: μ1 = μ2 and H1: μ1 ≠ μ2.`,
+                `Compute standard error: sqrt[(s1²/n1) + (s2²/n2)] = sqrt(${format(var1)} + ${format(var2)}) = ${format(se)}.`,
+                `Test statistic: <span class="inline-math">t = (x̄1 - x̄2)/SE = (${format(values.mean1)} - ${format(values.mean2)})/${format(se)} = ${format(t)}</span>.`,
+                `Welch degrees of freedom ≈ ${format(df)}.`,
+                `Two-sided p-value from the t distribution: ${format(pValue)}.`,
+                `Decision at α = ${format(values.alpha)}: ${pValue <= values.alpha ? "Reject H0" : "Fail to reject H0"}.`,
+                `${pValue <= values.alpha ? "The two population means are significantly different." : "There is not enough evidence that the two population means differ."}`
+              ]
+            };
+          }
+        },
+        {
+          id: "chi-square",
+          title: "Chi-square test",
+          intro: "Use this 2×2 calculator to test association between two categorical variables.",
+          rows: [
+            { step: "Step 1: Formulate hypotheses", value: "H0: No association; H1: Association exists" },
+            { step: "Step 2: Choose α", value: "Usually 0.05" },
+            { step: "Step 3: Select test", value: "Chi-square test" },
+            { step: "Step 4: Calculate test statistic", value: "χ² = Σ((O - E)^2/E)" },
+            { step: "Step 5: Determine p-value", value: "From chi-square table" },
+            { step: "Step 6: Decision", value: "Reject H0 if p ≤ α" },
+            { step: "Step 7: Interpretation", value: "Conclusion about association" }
+          ],
+          fields: [
+            { key: "a", label: "Cell A", step: "1", min: "0", placeholder: "e.g. 20" },
+            { key: "b", label: "Cell B", step: "1", min: "0", placeholder: "e.g. 12" },
+            { key: "c", label: "Cell C", step: "1", min: "0", placeholder: "e.g. 9" },
+            { key: "d", label: "Cell D", step: "1", min: "0", placeholder: "e.g. 16" },
+            { key: "alpha", label: "Significance level (α)", step: "0.001", min: "0.001", max: "0.2", value: "0.05" }
+          ],
+          compute(values) {
+            const r1 = values.a + values.b;
+            const r2 = values.c + values.d;
+            const c1 = values.a + values.c;
+            const c2 = values.b + values.d;
+            const total = r1 + r2;
+            const eA = (r1 * c1) / total;
+            const eB = (r1 * c2) / total;
+            const eC = (r2 * c1) / total;
+            const eD = (r2 * c2) / total;
+            const chi2 =
+              ((values.a - eA) ** 2) / eA +
+              ((values.b - eB) ** 2) / eB +
+              ((values.c - eC) ** 2) / eC +
+              ((values.d - eD) ** 2) / eD;
+            const df = 1;
+            const pValue = 1 - chiSquareCDF(chi2, df);
+            return {
+              statisticLabel: "χ²",
+              statistic: chi2,
+              pValue,
+              alpha: values.alpha,
+              reject: pValue <= values.alpha,
+              steps: [
+                `State hypotheses: H0: no association between the two categorical variables; H1: an association exists.`,
+                `Row totals: ${r1} and ${r2}. Column totals: ${c1} and ${c2}. Grand total: ${total}.`,
+                `Expected counts: E(A)=${format(eA)}, E(B)=${format(eB)}, E(C)=${format(eC)}, E(D)=${format(eD)}.`,
+                `Compute chi-square: <span class="inline-math">χ² = Σ((O-E)²/E) = ${format(chi2)}</span>.`,
+                `Degrees of freedom for a 2×2 table: (2-1)(2-1) = 1.`,
+                `p-value from the chi-square distribution: ${format(pValue)}.`,
+                `Decision at α = ${format(values.alpha)}: ${pValue <= values.alpha ? "Reject H0" : "Fail to reject H0"}.`,
+                `${pValue <= values.alpha ? "There is significant evidence of association." : "There is not enough evidence of association."}`
+              ]
+            };
+          }
+        }
+      ]
+    };
+
+    const tabsRoot = document.getElementById("tabs");
+    const overviewAccordion = document.getElementById("overviewAccordion");
+    const detailHeader = document.getElementById("detailHeader");
+    const tableBody = document.getElementById("tableBody");
+    const calculatorTitle = document.getElementById("calculatorTitle");
+    const calculatorIntro = document.getElementById("calculatorIntro");
+    const inputGrid = document.getElementById("inputGrid");
+    const calculatorForm = document.getElementById("calculatorForm");
+    const resetCalcButton = document.getElementById("resetCalcButton");
+    const statisticValue = document.getElementById("statisticValue");
+    const pValueText = document.getElementById("pValue");
+    const alphaValue = document.getElementById("alphaValue");
+    const decisionText = document.getElementById("decisionText");
+    const stepsOutput = document.getElementById("stepsOutput");
+
+    let activeColumnId = tableData.columns[0].id;
+    const overviewSteps = [
+      {
+        title: "Step 1: Formulate the hypotheses",
+        body: "Begin by clearly stating the null hypothesis (H₀) and the alternative hypothesis (H₁ or Ha). The null hypothesis usually represents no effect or no difference, while the alternative hypothesis reflects the expected effect or difference you want to test. These hypotheses must be specific and mutually exclusive."
+      },
+      {
+        title: "Step 2: Choose the level of significance (α)",
+        body: "Decide the probability of rejecting the null hypothesis when it is actually true. This is called the level of significance, commonly set at 0.05 (5%), 0.01, or 0.10 depending on the study. It reflects how much risk of error you are willing to accept."
+      },
+      {
+        title: "Step 3: Select the appropriate statistical test",
+        body: "Based on the type of data, sample size, and study design, choose a suitable statistical test (e.g., t-test, chi-square test, ANOVA). The choice depends on whether the data are categorical or continuous and whether assumptions like normality are met."
+      },
+      {
+        title: "Step 4: Calculate the test statistic",
+        body: "Using the sample data, compute the test statistic (such as t, z, or χ² value) according to the selected test. This statistic measures how far the observed data deviate from what is expected under the null hypothesis."
+      },
+      {
+        title: "Step 5: Determine the critical value or p-value",
+        body: "Compare the calculated test statistic with the critical value from statistical tables, or calculate the p-value. The p-value indicates the probability of obtaining the observed result (or more extreme) if the null hypothesis is true."
+      },
+      {
+        title: "Step 6: Make the decision",
+        body: "If the p-value is less than or equal to the significance level (p ≤ α), reject the null hypothesis. If the p-value is greater than α, fail to reject the null hypothesis. This step provides the statistical decision based on evidence."
+      },
+      {
+        title: "Step 7: Interpret and conclude",
+        body: "Finally, interpret the results in the context of the research problem. Clearly state whether there is sufficient evidence to support the alternative hypothesis and explain the practical or clinical significance of the findings."
+      }
+    ];
+
+    function renderOverview() {
+      overviewAccordion.innerHTML = "";
+
+      for (const [index, step] of overviewSteps.entries()) {
+        const item = document.createElement("article");
+        item.className = "accordion-item";
+        if (index === 0) {
+          item.classList.add("open");
+        }
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "accordion-toggle";
+        button.textContent = step.title;
+
+        const content = document.createElement("div");
+        content.className = "accordion-content";
+        content.textContent = step.body;
+
+        button.addEventListener("click", () => {
+          const allItems = overviewAccordion.querySelectorAll(".accordion-item");
+          for (const otherItem of allItems) {
+            otherItem.classList.remove("open");
+          }
+          item.classList.add("open");
+        });
+
+        item.append(button, content);
+        overviewAccordion.appendChild(item);
+      }
+    }
+
+    function format(value) {
+      if (!Number.isFinite(value)) {
+        return "NA";
+      }
+      const absValue = Math.abs(value);
+      if (absValue !== 0 && (absValue < 0.0001 || absValue >= 100000)) {
+        return value.toExponential(3);
+      }
+      return Number(value.toFixed(5)).toString();
+    }
+
+    function erf(x) {
+      const sign = x < 0 ? -1 : 1;
+      const absX = Math.abs(x);
+      const a1 = 0.254829592;
+      const a2 = -0.284496736;
+      const a3 = 1.421413741;
+      const a4 = -1.453152027;
+      const a5 = 1.061405429;
+      const p = 0.3275911;
+      const t = 1 / (1 + p * absX);
+      const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX);
+      return sign * y;
+    }
+
+    function normalCDF(z) {
+      return 0.5 * (1 + erf(z / Math.SQRT2));
+    }
+
+    function logGamma(z) {
+      const coefficients = [
+        676.5203681218851,
+        -1259.1392167224028,
+        771.3234287776531,
+        -176.6150291621406,
+        12.507343278686905,
+        -0.13857109526572012,
+        9.984369578019572e-6,
+        1.5056327351493116e-7
+      ];
+
+      if (z < 0.5) {
+        return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
+      }
+
+      let x = 0.9999999999998099;
+      let denom = z - 1;
+      for (let index = 0; index < coefficients.length; index += 1) {
+        x += coefficients[index] / (denom + index + 1);
+      }
+      const t = denom + coefficients.length - 0.5;
+      return 0.5 * Math.log(2 * Math.PI) + (denom + 0.5) * Math.log(t) - t + Math.log(x);
+    }
+
+    function betacf(x, a, b) {
+      const maxIterations = 200;
+      const epsilon = 3e-7;
+      const fpMin = 1e-30;
+      let qab = a + b;
+      let qap = a + 1;
+      let qam = a - 1;
+      let c = 1;
+      let d = 1 - (qab * x) / qap;
+      if (Math.abs(d) < fpMin) {
+        d = fpMin;
+      }
+      d = 1 / d;
+      let h = d;
+
+      for (let m = 1; m <= maxIterations; m += 1) {
+        const m2 = 2 * m;
+        let aa = (m * (b - m) * x) / ((qam + m2) * (a + m2));
+        d = 1 + aa * d;
+        if (Math.abs(d) < fpMin) {
+          d = fpMin;
+        }
+        c = 1 + aa / c;
+        if (Math.abs(c) < fpMin) {
+          c = fpMin;
+        }
+        d = 1 / d;
+        h *= d * c;
+
+        aa = (-(a + m) * (qab + m) * x) / ((a + m2) * (qap + m2));
+        d = 1 + aa * d;
+        if (Math.abs(d) < fpMin) {
+          d = fpMin;
+        }
+        c = 1 + aa / c;
+        if (Math.abs(c) < fpMin) {
+          c = fpMin;
+        }
+        d = 1 / d;
+        const delta = d * c;
+        h *= delta;
+        if (Math.abs(delta - 1) < epsilon) {
+          break;
+        }
+      }
+
+      return h;
+    }
+
+    function regularizedIncompleteBeta(x, a, b) {
+      if (x <= 0) {
+        return 0;
+      }
+      if (x >= 1) {
+        return 1;
+      }
+      const logBeta = logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log(1 - x);
+      const front = Math.exp(logBeta);
+      if (x < (a + 1) / (a + b + 2)) {
+        return (front * betacf(x, a, b)) / a;
+      }
+      return 1 - (front * betacf(1 - x, b, a)) / b;
+    }
+
+    function studentTCDF(t, df) {
+      if (t === 0) {
+        return 0.5;
+      }
+      const x = df / (df + t * t);
+      const ibeta = regularizedIncompleteBeta(x, df / 2, 0.5);
+      return t > 0 ? 1 - 0.5 * ibeta : 0.5 * ibeta;
+    }
+
+    function regularizedGammaP(s, x) {
+      if (x <= 0) {
+        return 0;
+      }
+
+      if (x < s + 1) {
+        let sum = 1 / s;
+        let term = sum;
+        for (let n = 1; n < 200; n += 1) {
+          term *= x / (s + n);
+          sum += term;
+          if (Math.abs(term) < Math.abs(sum) * 1e-12) {
+            break;
+          }
+        }
+        return sum * Math.exp(-x + s * Math.log(x) - logGamma(s));
+      }
+
+      let b = x + 1 - s;
+      let c = 1 / 1e-30;
+      let d = 1 / b;
+      let h = d;
+      for (let i = 1; i < 200; i += 1) {
+        const an = -i * (i - s);
+        b += 2;
+        d = an * d + b;
+        if (Math.abs(d) < 1e-30) {
+          d = 1e-30;
+        }
+        c = b + an / c;
+        if (Math.abs(c) < 1e-30) {
+          c = 1e-30;
+        }
+        d = 1 / d;
+        const delta = d * c;
+        h *= delta;
+        if (Math.abs(delta - 1) < 1e-12) {
+          break;
+        }
+      }
+      return 1 - Math.exp(-x + s * Math.log(x) - logGamma(s)) * h;
+    }
+
+    function chiSquareCDF(x, df) {
+      return regularizedGammaP(df / 2, x / 2);
+    }
+
+    function getActiveColumn() {
+      return tableData.columns.find((column) => column.id === activeColumnId);
+    }
+
+    function renderTabs() {
+      tabsRoot.innerHTML = "";
+
+      for (const column of tableData.columns) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "tab";
+        button.textContent = column.title;
+        button.setAttribute("aria-pressed", String(column.id === activeColumnId));
+
+        if (column.id === activeColumnId) {
+          button.classList.add("active");
+        }
+
+        button.addEventListener("click", () => {
+          activeColumnId = column.id;
+          render();
+        });
+
+        tabsRoot.appendChild(button);
+      }
+    }
+
+    function renderTable() {
+      const activeColumn = getActiveColumn();
+      detailHeader.textContent = activeColumn.title;
+      tableBody.innerHTML = "";
+
+      for (const row of activeColumn.rows) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="step-col">
+            <div class="cell-label">${tableData.stepHeader}</div>
+            ${row.step}
+          </td>
+          <td class="detail-col">
+            <div class="cell-label">${activeColumn.title}</div>
+            ${row.value}
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      }
+    }
+
+    function renderCalculatorForm() {
+      const activeColumn = getActiveColumn();
+      calculatorTitle.textContent = activeColumn.title + " Calculator";
+      calculatorIntro.textContent = activeColumn.intro;
+      inputGrid.innerHTML = "";
+
+      for (const field of activeColumn.fields) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "field";
+        wrapper.innerHTML = `
+          <label for="${field.key}">${field.label}</label>
+          <input
+            id="${field.key}"
+            name="${field.key}"
+            type="number"
+            step="${field.step || "any"}"
+            ${field.min !== undefined ? `min="${field.min}"` : ""}
+            ${field.max !== undefined ? `max="${field.max}"` : ""}
+            ${field.value !== undefined ? `value="${field.value}"` : ""}
+            placeholder="${field.placeholder || ""}"
+            required
+          >
+        `;
+        inputGrid.appendChild(wrapper);
+      }
+
+      clearResults();
+    }
+
+    function clearResults() {
+      statisticValue.textContent = "-";
+      pValueText.textContent = "-";
+      alphaValue.textContent = "-";
+      decisionText.textContent = "Fill the calculator inputs and click Run Test.";
+      decisionText.className = "decision";
+      stepsOutput.innerHTML = "";
+    }
+
+    function parseValues(column) {
+      const values = {};
+      for (const field of column.fields) {
+        const input = calculatorForm.elements[field.key];
+        values[field.key] = Number(input.value);
+      }
+      return values;
+    }
+
+    function validateValues(column, values) {
+      for (const field of column.fields) {
+        const value = values[field.key];
+        if (!Number.isFinite(value)) {
+          return `${field.label} must be a valid number.`;
+        }
+      }
+
+      if (column.id === "z-proportion") {
+        if (values.n <= 0 || values.x < 0 || values.x > values.n || values.p0 <= 0 || values.p0 >= 1) {
+          return "Use 0 ≤ x ≤ n and 0 < p0 < 1.";
+        }
+      }
+
+      if (column.id === "t-mean") {
+        if (values.n < 2 || values.sd <= 0) {
+          return "For the one-sample t test, n must be at least 2 and SD must be positive.";
+        }
+      }
+
+      if (column.id === "z-diff-proportion") {
+        if (values.n1 <= 0 || values.n2 <= 0 || values.x1 < 0 || values.x2 < 0 || values.x1 > values.n1 || values.x2 > values.n2) {
+          return "Use 0 ≤ x1 ≤ n1 and 0 ≤ x2 ≤ n2 with positive sample sizes.";
+        }
+      }
+
+      if (column.id === "unpaired-t") {
+        if (values.n1 < 2 || values.n2 < 2 || values.sd1 <= 0 || values.sd2 <= 0) {
+          return "For the unpaired t test, each sample size must be at least 2 and each SD must be positive.";
+        }
+      }
+
+      if (column.id === "chi-square") {
+        const total = values.a + values.b + values.c + values.d;
+        if (total <= 0) {
+          return "At least one observed count must be greater than zero.";
+        }
+      }
+
+      if (values.alpha <= 0 || values.alpha >= 1) {
+        return "Alpha must be between 0 and 1.";
+      }
+
+      return "";
+    }
+
+    function renderResults(result) {
+      statisticValue.textContent = `${result.statisticLabel} = ${format(result.statistic)}`;
+      pValueText.textContent = format(result.pValue);
+      alphaValue.textContent = format(result.alpha);
+      decisionText.textContent = result.reject ? "Result: Reject H0" : "Result: Fail to reject H0";
+      decisionText.className = `decision ${result.reject ? "good" : "bad"}`;
+      stepsOutput.innerHTML = "";
+
+      for (const step of result.steps) {
+        const item = document.createElement("li");
+        item.innerHTML = step;
+        stepsOutput.appendChild(item);
+      }
+    }
+
+    calculatorForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const column = getActiveColumn();
+      const values = parseValues(column);
+      const validationMessage = validateValues(column, values);
+
+      if (validationMessage) {
+        decisionText.textContent = validationMessage;
+        decisionText.className = "decision bad";
+        stepsOutput.innerHTML = "";
+        statisticValue.textContent = "-";
+        pValueText.textContent = "-";
+        alphaValue.textContent = "-";
+        return;
+      }
+
+      try {
+        const result = column.compute(values);
+        renderResults(result);
+      } catch (error) {
+        decisionText.textContent = "The calculation could not be completed with these inputs.";
+        decisionText.className = "decision bad";
+        stepsOutput.innerHTML = "";
+        statisticValue.textContent = "-";
+        pValueText.textContent = "-";
+        alphaValue.textContent = "-";
+      }
+    });
+
+    resetCalcButton.addEventListener("click", () => {
+      renderCalculatorForm();
+    });
+
+    function render() {
+      renderOverview();
+      renderTabs();
+      renderTable();
+      renderCalculatorForm();
+    }
+
+    render();
+  </script>
+</body>
+</html>
+
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<style id="phfy-page-system">
+/* Public Health for You shared blue mobile-first page system */
+:root{--phfy-ink:#102033;--phfy-muted:#536476;--phfy-line:#d7e4f2;--phfy-soft:#f3f8fd;--phfy-panel:#fff;--phfy-blue:#1769aa;--phfy-blue-dark:#0b3d66;--phfy-blue-soft:#e7f2fb;--phfy-sky:#5bb7df;--phfy-teal:#12848a;--phfy-shadow:0 18px 55px rgba(16,32,51,.13)}
+body{display:block!important;height:auto!important;min-height:100vh!important;background:radial-gradient(circle at top left,rgba(91,183,223,.15),transparent 32%),var(--phfy-soft)!important;color:var(--phfy-ink)!important;font-family:var(--wp--preset--font-family--literata),Georgia,serif!important;letter-spacing:0!important;line-height:1.65!important}.wp-site-blocks{background:#fff!important}.wp-site-blocks main,.wp-site-blocks .page,.wp-site-blocks .app,.wp-site-blocks .container,.wp-site-blocks .wrap,.wp-site-blocks .game-wrap,.wp-site-blocks .tool-wrap,.wp-site-blocks .calculator-wrap{box-sizing:border-box;width:min(1120px,calc(100vw - 32px))!important;max-width:1120px!important;margin:clamp(1.25rem,4vw,2.75rem) auto!important;padding:0!important}.wp-site-blocks .shell,.wp-site-blocks .card,.wp-site-blocks .panel,.wp-site-blocks .calculator,.wp-site-blocks .result-panel,.wp-site-blocks .slide,.wp-site-blocks .module,.wp-site-blocks .quiz,.wp-site-blocks .game,.wp-site-blocks .content-card{background:var(--phfy-panel)!important;border:1px solid var(--phfy-line)!important;border-radius:14px!important;box-shadow:var(--phfy-shadow)!important;color:var(--phfy-ink)!important}.wp-site-blocks .hero,.wp-site-blocks .page-header,.wp-site-blocks .tool-header,.wp-site-blocks .calculator-header,.wp-site-blocks header.hero{background:linear-gradient(180deg,rgba(23,105,170,.1),rgba(23,105,170,0)) #fff!important;border-bottom:1px solid var(--phfy-line)!important;color:var(--phfy-ink)!important;padding:clamp(1rem,3vw,1.85rem)!important}.wp-site-blocks h1,.wp-site-blocks h2,.wp-site-blocks h3,.wp-site-blocks h4,.wp-site-blocks h5,.wp-site-blocks h6{color:var(--phfy-blue-dark)!important;font-family:var(--wp--preset--font-family--beiruti),Arial,sans-serif!important;font-weight:750!important;letter-spacing:0!important;line-height:1.15!important}.wp-site-blocks p,.wp-site-blocks li,.wp-site-blocks td,.wp-site-blocks th,.wp-site-blocks label,.wp-site-blocks .subtext,.wp-site-blocks .field-note,.wp-site-blocks .hint,.wp-site-blocks .content p{color:var(--phfy-ink)!important;letter-spacing:0!important}.wp-site-blocks .subtext,.wp-site-blocks .field-note,.wp-site-blocks .hint,.wp-site-blocks .muted,.wp-site-blocks small{color:var(--phfy-muted)!important}.wp-site-blocks button,.wp-site-blocks input,.wp-site-blocks select,.wp-site-blocks textarea{font:inherit!important;letter-spacing:0!important}.wp-site-blocks input,.wp-site-blocks select,.wp-site-blocks textarea{background:#fff!important;border:1px solid var(--phfy-line)!important;border-radius:10px!important;color:var(--phfy-ink)!important;min-height:42px!important;padding:.65rem .75rem!important}.wp-site-blocks button,.wp-site-blocks .button,.wp-site-blocks .action,.wp-site-blocks .tab,.wp-site-blocks .controls button,.wp-site-blocks aside button,.wp-site-blocks .lang-toggle button{border-radius:999px!important;border:1px solid rgba(23,105,170,.24)!important;box-shadow:none!important;cursor:pointer;font-weight:700!important;min-height:42px!important;transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease,transform 160ms ease!important}.wp-site-blocks button:hover,.wp-site-blocks .button:hover,.wp-site-blocks .action:hover,.wp-site-blocks .tab:hover,.wp-site-blocks .controls button:hover,.wp-site-blocks aside button:hover{transform:translateY(-1px)}.wp-site-blocks button.action,.wp-site-blocks button.active,.wp-site-blocks .tab.active,.wp-site-blocks aside button.active,.wp-site-blocks .lang-toggle button.active,.wp-site-blocks .primary,.wp-site-blocks .wp-block-button__link{background:var(--phfy-blue-dark)!important;border-color:var(--phfy-blue-dark)!important;color:#fff!important}.wp-site-blocks button.secondary,.wp-site-blocks .action.secondary,.wp-site-blocks .tab:not(.active),.wp-site-blocks aside button:not(.active),.wp-site-blocks .controls button,.wp-site-blocks .lang-toggle button:not(.active){background:var(--phfy-blue-soft)!important;color:var(--phfy-blue-dark)!important}.wp-site-blocks table{border-collapse:separate!important;border-spacing:0!important;overflow:hidden;width:100%!important}.wp-site-blocks th{background:var(--phfy-blue-soft)!important;color:var(--phfy-blue-dark)!important;font-weight:750!important}.wp-site-blocks th,.wp-site-blocks td{border-color:var(--phfy-line)!important}.wp-site-blocks .graphic,.wp-site-blocks .illustration,.wp-site-blocks .icon-panel{background:var(--phfy-blue-soft)!important}.wp-site-blocks .graphic svg,.wp-site-blocks .illustration svg,.wp-site-blocks svg{stroke:var(--phfy-blue-dark)}.wp-site-blocks aside{background:#f6faff!important;border-color:var(--phfy-line)!important;color:var(--phfy-ink)!important}.wp-site-blocks .controls,.wp-site-blocks footer{background:#fff!important;border-color:var(--phfy-line)!important;color:var(--phfy-muted)!important}.wp-site-blocks iframe,.wp-site-blocks canvas,.wp-site-blocks video{max-width:100%!important}@media(max-width:781px){.wp-site-blocks main,.wp-site-blocks .page,.wp-site-blocks .app,.wp-site-blocks .container,.wp-site-blocks .wrap,.wp-site-blocks .game-wrap,.wp-site-blocks .tool-wrap,.wp-site-blocks .calculator-wrap{width:min(100vw - 16px,100%)!important;margin:.85rem auto!important}.wp-site-blocks .hero,.wp-site-blocks .page-header,.wp-site-blocks .tool-header,.wp-site-blocks .calculator-header,.wp-site-blocks header.hero{padding:1rem!important}.wp-site-blocks .shell,.wp-site-blocks .card,.wp-site-blocks .panel,.wp-site-blocks .calculator,.wp-site-blocks .result-panel,.wp-site-blocks .slide,.wp-site-blocks .module,.wp-site-blocks .quiz,.wp-site-blocks .game,.wp-site-blocks .content-card{border-radius:10px!important}.wp-site-blocks aside{width:100%!important}.wp-site-blocks .content{padding:1.15rem!important;width:100%!important}.wp-site-blocks .graphic{width:100%!important;min-height:150px}.wp-site-blocks .controls{display:grid!important;gap:.65rem!important;padding:.85rem!important}.wp-site-blocks .controls button{margin:0!important;width:100%!important}.wp-site-blocks h1{font-size:clamp(1.35rem,7vw,2rem)!important}.wp-site-blocks h2{font-size:clamp(1.2rem,5.5vw,1.65rem)!important}.wp-site-blocks p,.wp-site-blocks li{font-size:1rem!important}}
+</style>
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<style id="phfy-force-blue-mobile">
+/* Final blue health consistency layer */
+.wp-site-blocks{--gov:#1769aa!important;--tab-active:#1769aa!important;--tab-active-ink:#fff!important;--accent:#1769aa!important;--accent-soft:#e7f2fb!important;--panel:#fff!important;--bg:#f3f8fd!important;--line:#d7e4f2!important;--text:#102033!important;--muted:#536476!important;--step-bg:#e7f2fb!important;color:#102033!important;background:#fff!important}.wp-site-blocks *{box-sizing:border-box}.wp-site-blocks article,.wp-site-blocks section,.wp-site-blocks main,.wp-site-blocks .page,.wp-site-blocks .shell,.wp-site-blocks .container,.wp-site-blocks .app,.wp-site-blocks .wrap{border-color:#d7e4f2!important}.wp-site-blocks .shell,.wp-site-blocks .panel,.wp-site-blocks .card,.wp-site-blocks .calculator,.wp-site-blocks .result-panel,.wp-site-blocks .game,.wp-site-blocks .module,.wp-site-blocks .slide,.wp-site-blocks .quiz,.wp-site-blocks .crossword,.wp-site-blocks .board-panel,.wp-site-blocks .input-panel,.wp-site-blocks .output-panel{background:#fff!important;border:1px solid #d7e4f2!important;border-radius:14px!important;box-shadow:0 18px 55px rgba(16,32,51,.13)!important}.wp-site-blocks .hero,.wp-site-blocks .page-header,.wp-site-blocks .tool-header,.wp-site-blocks .calculator-header,.wp-site-blocks .header,.wp-site-blocks header:not(.wp-block-template-part){background:linear-gradient(180deg,rgba(23,105,170,.1),rgba(23,105,170,0)) #fff!important;border-color:#d7e4f2!important;color:#102033!important}.wp-site-blocks h1,.wp-site-blocks h2,.wp-site-blocks h3,.wp-site-blocks .title,.wp-site-blocks .section-title{color:#0b3d66!important;letter-spacing:0!important}.wp-site-blocks p,.wp-site-blocks li,.wp-site-blocks label,.wp-site-blocks span,.wp-site-blocks td{letter-spacing:0!important}.wp-site-blocks .graphic,.wp-site-blocks .illustration,.wp-site-blocks .icon-panel,.wp-site-blocks .result-summary,.wp-site-blocks .step-col,.wp-site-blocks th,.wp-site-blocks .accordion-toggle{background:#e7f2fb!important;color:#0b3d66!important}.wp-site-blocks svg{stroke:#0b3d66}.wp-site-blocks button,.wp-site-blocks .button,.wp-site-blocks .btn,.wp-site-blocks .action,.wp-site-blocks .tab,.wp-site-blocks .controls button,.wp-site-blocks .lang-toggle button,.wp-site-blocks aside button{border-radius:999px!important;border:1px solid rgba(23,105,170,.25)!important;font-weight:700!important}.wp-site-blocks button.active,.wp-site-blocks .active,.wp-site-blocks .tab.active,.wp-site-blocks .action:not(.secondary),.wp-site-blocks .primary,.wp-site-blocks aside button.active,.wp-site-blocks .lang-toggle button.active{background:#0b3d66!important;border-color:#0b3d66!important;color:#fff!important}.wp-site-blocks button.secondary,.wp-site-blocks .secondary,.wp-site-blocks .tab:not(.active),.wp-site-blocks .controls button,.wp-site-blocks aside button:not(.active),.wp-site-blocks .lang-toggle button:not(.active){background:#e7f2fb!important;color:#0b3d66!important}.wp-site-blocks input,.wp-site-blocks select,.wp-site-blocks textarea{border:1px solid #d7e4f2!important;border-radius:10px!important;background:#fff!important;color:#102033!important}.wp-site-blocks table{border-color:#d7e4f2!important}.wp-site-blocks aside{background:#f6faff!important;border-color:#d7e4f2!important}.wp-site-blocks footer,.wp-site-blocks .footer,.wp-site-blocks .controls{background:#fff!important;border-color:#d7e4f2!important;color:#536476!important}@media(max-width:781px){.wp-site-blocks main,.wp-site-blocks .page,.wp-site-blocks .container,.wp-site-blocks .app,.wp-site-blocks .wrap{width:min(100vw - 14px,100%)!important;max-width:100%!important;margin:.75rem auto!important}.wp-site-blocks .shell,.wp-site-blocks .panel,.wp-site-blocks .card,.wp-site-blocks .calculator,.wp-site-blocks .result-panel,.wp-site-blocks .game,.wp-site-blocks .module,.wp-site-blocks .slide{border-radius:10px!important}.wp-site-blocks .slide,.wp-site-blocks .calc-layout,.wp-site-blocks .layout,.wp-site-blocks .grid,.wp-site-blocks .content-row{grid-template-columns:1fr!important;flex-direction:column!important}.wp-site-blocks aside{width:100%!important;max-width:100%!important;display:flex!important;overflow-x:auto!important}.wp-site-blocks aside button{min-width:220px!important}.wp-site-blocks .graphic,.wp-site-blocks .content{width:100%!important}.wp-site-blocks .content{padding:1rem!important}.wp-site-blocks .controls{display:grid!important;grid-template-columns:1fr!important;gap:.65rem!important;padding:.8rem!important}.wp-site-blocks .controls button{width:100%!important;margin:0!important}.wp-site-blocks h1{font-size:clamp(1.35rem,7vw,2rem)!important}.wp-site-blocks h2{font-size:clamp(1.2rem,5.5vw,1.65rem)!important}.wp-site-blocks p,.wp-site-blocks li,.wp-site-blocks td,.wp-site-blocks label{font-size:1rem!important}}
+</style>
+<!-- /wp:html -->

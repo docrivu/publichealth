@@ -1,0 +1,24 @@
+CREATE TABLE IF NOT EXISTS bht_users (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(120) NOT NULL,
+    username VARCHAR(60) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('super_admin', 'collector') NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS bht_assessments (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    uid VARCHAR(40) NOT NULL UNIQUE,
+    collector_id INT UNSIGNED NOT NULL,
+    patient_name VARCHAR(160) DEFAULT NULL,
+    patient_age VARCHAR(20) DEFAULT NULL,
+    patient_sex VARCHAR(30) DEFAULT NULL,
+    first_assessment_date DATE DEFAULT NULL,
+    contact_person VARCHAR(160) DEFAULT NULL,
+    payload_json LONGTEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_bht_assessments_collector FOREIGN KEY (collector_id) REFERENCES bht_users(id)
+);

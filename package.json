@@ -1,0 +1,13 @@
+{
+  "name": "rivubasu-com",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Versioned source and WordPress content deployment tools for rivubasu.com.",
+  "scripts": {
+    "wp:export": "node scripts/wp-export.mjs",
+    "wp:deploy": "node scripts/wp-deploy.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

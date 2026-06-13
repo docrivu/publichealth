@@ -1,0 +1,9 @@
+public_html/config/app.php
+public_html/bht/config/app.php
+bht_source/config/app.php
+public_html/.DS_Store
+public_html/public/.DS_Store
+public_html/uploads/*
+!public_html/uploads/.htaccess
+public_html/storage/*
+public_html/bht/storage/*

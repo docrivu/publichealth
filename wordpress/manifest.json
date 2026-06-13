@@ -1,0 +1,155 @@
+[
+  {
+    "id": 261,
+    "slug": "contact",
+    "title": "Contact",
+    "link": "https://rivubasu.com/contact/",
+    "status": "publish",
+    "modified": "2026-06-12T11:42:50",
+    "file": "pages/contact.html"
+  },
+  {
+    "id": 7,
+    "slug": "ewe",
+    "title": "Extreme Weather Events",
+    "link": "https://rivubasu.com/ewe/",
+    "status": "publish",
+    "modified": "2026-06-13T12:04:38",
+    "file": "pages/ewe.html"
+  },
+  {
+    "id": 40,
+    "slug": "public-education-materials",
+    "title": "Public Education Materials",
+    "link": "https://rivubasu.com/public-education-materials/",
+    "status": "publish",
+    "modified": "2026-06-13T11:50:47",
+    "file": "pages/public-education-materials.html"
+  },
+  {
+    "id": 50,
+    "slug": "learning-epidemiology-and-biostats",
+    "title": "Learning Biostats",
+    "link": "https://rivubasu.com/learning-epidemiology-and-biostats/",
+    "status": "publish",
+    "modified": "2026-06-13T11:50:48",
+    "file": "pages/learning-epidemiology-and-biostats.html"
+  },
+  {
+    "id": 80,
+    "slug": "games",
+    "title": "Epidemiology Game",
+    "link": "https://rivubasu.com/games/",
+    "status": "publish",
+    "modified": "2026-06-12T10:53:36",
+    "file": "pages/games.html"
+  },
+  {
+    "id": 83,
+    "slug": "waste-sorting-game",
+    "title": "Waste Sorting Game",
+    "link": "https://rivubasu.com/waste-sorting-game/",
+    "status": "publish",
+    "modified": "2026-06-12T10:53:35",
+    "file": "pages/waste-sorting-game.html"
+  },
+  {
+    "id": 87,
+    "slug": "stats-calculator",
+    "title": "Stats Calculator",
+    "link": "https://rivubasu.com/stats-calculator/",
+    "status": "publish",
+    "modified": "2026-06-12T11:29:52",
+    "file": "pages/stats-calculator.html"
+  },
+  {
+    "id": 90,
+    "slug": "games-2",
+    "title": "Games",
+    "link": "https://rivubasu.com/games-2/",
+    "status": "publish",
+    "modified": "2026-06-13T11:50:48",
+    "file": "pages/games-2.html"
+  },
+  {
+    "id": 95,
+    "slug": "sample-size-calculator",
+    "title": "Sample Size Calculator",
+    "link": "https://rivubasu.com/sample-size-calculator/",
+    "status": "publish",
+    "modified": "2026-06-12T11:29:53",
+    "file": "pages/sample-size-calculator.html"
+  },
+  {
+    "id": 126,
+    "slug": "nutrient-calculator",
+    "title": "Nutrient Tool",
+    "link": "https://rivubasu.com/nutrient-calculator/",
+    "status": "publish",
+    "modified": "2026-06-12T11:29:54",
+    "file": "pages/nutrient-calculator.html"
+  },
+  {
+    "id": 136,
+    "slug": "calculator",
+    "title": "Calculators",
+    "link": "https://rivubasu.com/calculator/",
+    "status": "publish",
+    "modified": "2026-06-13T11:50:46",
+    "file": "pages/calculator.html"
+  },
+  {
+    "id": 147,
+    "slug": "statistics-simulation-lab",
+    "title": "Statistics Simulation Lab",
+    "link": "https://rivubasu.com/statistics-simulation-lab/",
+    "status": "publish",
+    "modified": "2026-06-13T11:50:49",
+    "file": "pages/statistics-simulation-lab.html"
+  },
+  {
+    "id": 152,
+    "slug": "operations-research",
+    "title": "Operations Research",
+    "link": "https://rivubasu.com/operations-research/",
+    "status": "publish",
+    "modified": "2026-06-13T11:50:49",
+    "file": "pages/operations-research.html"
+  },
+  {
+    "id": 164,
+    "slug": "infectious-disease-modeling",
+    "title": "Infectious Disease Modeling",
+    "link": "https://rivubasu.com/infectious-disease-modeling/",
+    "status": "publish",
+    "modified": "2026-06-13T11:50:49",
+    "file": "pages/infectious-disease-modeling.html"
+  },
+  {
+    "id": 232,
+    "slug": "rda-calculator",
+    "title": "RDA Calculator",
+    "link": "https://rivubasu.com/rda-calculator/",
+    "status": "publish",
+    "modified": "2026-06-12T11:28:50",
+    "file": "pages/rda-calculator.html"
+  },
+  {
+    "id": 233,
+    "slug": "anthropac",
+    "title": "Cultural Analysis",
+    "link": "https://rivubasu.com/anthropac/",
+    "status": "publish",
+    "modified": "2026-06-13T06:07:22",
+    "file": "pages/anthropac.html"
+  },
+  {
+    "id": 234,
+    "slug": "growth-chart",
+    "title": "Growth Chart",
+    "link": "https://rivubasu.com/growth-chart/",
+    "status": "publish",
+    "modified": "2026-06-12T11:28:51",
+    "file": "pages/growth-chart.html"
+  }
+]

@@ -1,0 +1,923 @@
+<!-- wp:html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rivu Epidemiology:</title>
+  <style>
+    :root {
+      --bg: #f3efe3;
+      --panel: #fffdf7;
+      --ink: #19231e;
+      --muted: #5d6a63;
+      --accent: #1d7d57;
+      --accent-2: #e7f4ec;
+      --border: #b8c7bb;
+      --cell: 2.5rem;
+      --shadow: 0 18px 40px rgba(25, 35, 30, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(29, 125, 87, 0.16), transparent 28%),
+        linear-gradient(180deg, #faf6ea 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+    }
+
+    .hero {
+      background: var(--panel);
+      border: 2px solid rgba(29, 125, 87, 0.18);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 1.4rem 1.4rem 1.2rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.35rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .subhead {
+      margin: 0.7rem 0 1rem;
+      max-width: 60ch;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.72rem 1rem;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: transform 120ms ease, opacity 120ms ease, background 120ms ease;
+    }
+
+    button.secondary {
+      background: #dde8df;
+      color: var(--ink);
+    }
+
+    button:hover,
+    button:focus-visible {
+      transform: translateY(-1px);
+    }
+
+    button:focus-visible,
+    .cell-input:focus-visible {
+      outline: 3px solid rgba(29, 125, 87, 0.25);
+      outline-offset: 2px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .stat {
+      background: var(--accent-2);
+      border: 1px solid rgba(29, 125, 87, 0.15);
+      border-radius: 999px;
+      padding: 0.55rem 0.85rem;
+    }
+
+    .layout {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+      align-items: start;
+    }
+
+    .board,
+    .clues {
+      background: var(--panel);
+      border: 2px solid rgba(25, 35, 30, 0.08);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .board {
+      padding: 1.1rem;
+      overflow: auto;
+    }
+
+    .board-header,
+    .clues-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .board-header h2,
+    .clues-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .grid-wrap {
+      display: inline-block;
+      background:
+        linear-gradient(135deg, rgba(29, 125, 87, 0.08), transparent 40%),
+        #eef3ed;
+      padding: 0.9rem;
+      border-radius: 20px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 2px;
+      align-items: start;
+      justify-content: start;
+    }
+
+    .grid-cell {
+      width: var(--cell);
+      height: var(--cell);
+      position: relative;
+      background: white;
+      border: 1px solid rgba(25, 35, 30, 0.22);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+
+    .grid-cell.block {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .grid-cell.active {
+      background: #fcf7d1;
+      border-color: #bd9f2f;
+    }
+
+    .grid-cell.matching {
+      background: #f4fbf7;
+      border-color: rgba(29, 125, 87, 0.55);
+    }
+
+    .grid-cell.correct {
+      background: #dff5e6;
+    }
+
+    .grid-cell.incorrect {
+      background: #fbe3df;
+    }
+
+    .number {
+      position: absolute;
+      top: 0.08rem;
+      left: 0.12rem;
+      font-size: 0.56rem;
+      line-height: 1;
+      color: var(--muted);
+      font-family: Arial, Helvetica, sans-serif;
+      pointer-events: none;
+    }
+
+    .cell-input {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--ink);
+      padding-top: 0.35rem;
+      caret-color: var(--accent);
+    }
+
+    .cell-input[readonly] {
+      cursor: pointer;
+    }
+
+    .clues {
+      padding: 1.1rem;
+    }
+
+    .clue-columns {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .clue-group h3 {
+      margin: 0 0 0.6rem;
+      font-size: 1rem;
+    }
+
+    .clue-list {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .clue {
+      background: #f9f7ef;
+      border: 1px solid rgba(25, 35, 30, 0.08);
+      border-radius: 16px;
+      padding: 0.8rem 0.85rem;
+      cursor: pointer;
+      transition: border-color 120ms ease, transform 120ms ease, background 120ms ease;
+    }
+
+    .clue:hover,
+    .clue:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(29, 125, 87, 0.35);
+    }
+
+    .clue.active {
+      background: #edf8f0;
+      border-color: rgba(29, 125, 87, 0.55);
+    }
+
+    .clue-label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .clue-text {
+      margin: 0;
+      line-height: 1.35;
+      font-size: 0.98rem;
+    }
+
+    .clue-meta {
+      margin: 0.38rem 0 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .status {
+      margin-top: 1rem;
+      background: #f2f7f3;
+      border: 1px solid rgba(29, 125, 87, 0.12);
+      border-radius: 18px;
+      padding: 0.9rem 1rem;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      min-height: 3.4rem;
+      display: flex;
+      align-items: center;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .clue-columns {
+        grid-template-columns: 1fr;
+      }
+
+      :root {
+        --cell: 2.15rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <p class="eyebrow">Rivu Basu's Epidemiology Game</p>
+      <h1>Epidemiology Crossword</h1>
+      <p class="subhead">
+        This is made for IAPSM World Health day Quiz 2026
+      </p>
+      <div class="toolbar">
+        <button id="check-word">Check Word</button>
+        <button id="check-puzzle" class="secondary">Check Puzzle</button>
+        <button id="reveal-letter" class="secondary">Reveal Letter</button>
+        <button id="reveal-word" class="secondary">Reveal Word</button>
+        <button id="reset-puzzle" class="secondary">Reset</button>
+      </div>
+      <div class="stats" aria-live="polite">
+        <div class="stat" id="filled-stat">0 / 76 letters filled</div>
+        <div class="stat" id="solved-stat">0 / 9 words solved</div>
+        <div class="stat" id="selected-stat">No clue selected</div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="board">
+        <div class="board-header">
+          <h2>Grid</h2>
+          <p class="hint">Arrow keys move. Press space on a selected square to switch direction.</p>
+        </div>
+        <div class="grid-wrap">
+          <div id="grid" class="grid" role="grid" aria-label="Crossword puzzle"></div>
+        </div>
+      </div>
+
+      <aside class="clues">
+        <div class="clues-header">
+          <h2>Clues</h2>
+          <p class="hint">Definitions are based on the worksheet terms.</p>
+        </div>
+        <div class="clue-columns">
+          <section class="clue-group">
+            <h3>Across</h3>
+            <div id="across-clues" class="clue-list"></div>
+          </section>
+          <section class="clue-group">
+            <h3>Down</h3>
+            <div id="down-clues" class="clue-list"></div>
+          </section>
+        </div>
+        <div id="status" class="status">Select any clue to begin.</div>
+      </aside>
+    </section>
+  </div>
+
+  <script>
+    const entries = [
+      { id: "A1", answer: "SENSITIVITY", clue: "I am crucial in serious conditions where missing a case could have severe consequences.", direction: "across", x: 0, y: 0 },
+      { id: "D1", answer: "TEMPORALITY", clue: "I am the only essential criterion for establishing causality-I require that the cause must precede the effect.", direction: "down", x: 4, y: -8 },
+      { id: "A2", answer: "PREVALENCE", clue: "I am influenced not only by how often disease occurs but also by how long people live with it.", direction: "across", x: -2, y: -7 },
+      { id: "D2", answer: "INCIDENCE", clue: "I begin at zero for everyone and increase only when someone newly falls ill during follow-up. I am expressed as a rate or risk. Who am I?.", direction: "down", x: 5, y: -13 },
+      { id: "D3", answer: "MORBIDITY", clue: "I represent the state of illness in a population, regardless of whether it leads to death. What am I.", direction: "down", x: -1, y: -9 },
+      { id: "A3", answer: "ETIOLOGY", clue: "I deal with the cause or origin of a disease, not its manifestations or outcomes. What am I.", direction: "across", x: -3, y: 2 },
+      { id: "D4", answer: "VALIDITY", clue: "I reflect how close a measurement or study result is to the true value. What am I.", direction: "down", x: 6, y: -5 },
+      { id: "A4", answer: "COHORT", clue: "I may move forward in real time or reconstruct the past using records, but always maintain the same directional logic.", direction: "across", x: -4, y: -8 },
+      { id: "D5", answer: "BIAS", clue: "I am a systematic error that leads to an incorrect estimate of the association between exposure and outcome.", direction: "down", x: 0, y: -3 }
+    ];
+
+    const state = {
+      direction: "across",
+      selectedEntryId: null,
+      selectedCellKey: null,
+      cellElements: new Map(),
+      inputElements: new Map(),
+      cellsByKey: new Map(),
+      normalizedEntries: []
+    };
+
+    const gridEl = document.getElementById("grid");
+    const acrossCluesEl = document.getElementById("across-clues");
+    const downCluesEl = document.getElementById("down-clues");
+    const statusEl = document.getElementById("status");
+    const filledStatEl = document.getElementById("filled-stat");
+    const solvedStatEl = document.getElementById("solved-stat");
+    const selectedStatEl = document.getElementById("selected-stat");
+
+    function normalizeEntries(items) {
+      const minX = Math.min(...items.map((entry) => entry.x));
+      const minY = Math.min(...items.map((entry) => entry.y));
+      return items.map((entry) => ({
+        ...entry,
+        x: entry.x - minX,
+        y: entry.y - minY
+      }));
+    }
+
+    function getCellKey(x, y) {
+      return `${x},${y}`;
+    }
+
+    function getEntryCells(entry) {
+      return Array.from({ length: entry.answer.length }, (_, index) => ({
+        x: entry.x + (entry.direction === "across" ? index : 0),
+        y: entry.y + (entry.direction === "down" ? index : 0),
+        index,
+        letter: entry.answer[index]
+      }));
+    }
+
+    function buildCellMap(items) {
+      const map = new Map();
+      for (const entry of items) {
+        const cells = getEntryCells(entry);
+        for (const cell of cells) {
+          const key = getCellKey(cell.x, cell.y);
+          if (!map.has(key)) {
+            map.set(key, {
+              x: cell.x,
+              y: cell.y,
+              solution: cell.letter,
+              entries: []
+            });
+          }
+          map.get(key).entries.push({
+            entryId: entry.id,
+            index: cell.index
+          });
+        }
+      }
+      return map;
+    }
+
+    function assignNumbers(items) {
+      const starts = [...items]
+        .map((entry) => ({ id: entry.id, x: entry.x, y: entry.y }))
+        .sort((a, b) => a.y - b.y || a.x - b.x);
+
+      let currentNumber = 1;
+      let lastKey = "";
+      const numbers = new Map();
+      for (const start of starts) {
+        const key = getCellKey(start.x, start.y);
+        if (key !== lastKey) {
+          numbers.set(key, currentNumber);
+          currentNumber += 1;
+          lastKey = key;
+        }
+      }
+
+      return items.map((entry) => ({
+        ...entry,
+        number: numbers.get(getCellKey(entry.x, entry.y))
+      }));
+    }
+
+    function render() {
+      state.normalizedEntries = assignNumbers(normalizeEntries(entries));
+      state.cellsByKey = buildCellMap(state.normalizedEntries);
+
+      const maxX = Math.max(...[...state.cellsByKey.values()].map((cell) => cell.x));
+      const maxY = Math.max(...[...state.cellsByKey.values()].map((cell) => cell.y));
+      gridEl.style.gridTemplateColumns = `repeat(${maxX + 1}, var(--cell))`;
+      gridEl.style.gridTemplateRows = `repeat(${maxY + 1}, var(--cell))`;
+
+      for (let y = 0; y <= maxY; y += 1) {
+        for (let x = 0; x <= maxX; x += 1) {
+          const key = getCellKey(x, y);
+          const cell = state.cellsByKey.get(key);
+          const wrapper = document.createElement("div");
+          wrapper.className = `grid-cell${cell ? "" : " block"}`;
+          wrapper.dataset.key = key;
+
+          if (cell) {
+            const input = document.createElement("input");
+            input.className = "cell-input";
+            input.type = "text";
+            input.inputMode = "text";
+            input.maxLength = 1;
+            input.autocomplete = "off";
+            input.spellcheck = false;
+            input.dataset.key = key;
+            input.setAttribute("aria-label", `Crossword cell ${x + 1}, ${y + 1}`);
+            input.addEventListener("focus", () => selectCell(key));
+            input.addEventListener("click", () => selectCell(key));
+            input.addEventListener("keydown", handleCellKeyDown);
+            input.addEventListener("input", handleCellInput);
+            wrapper.appendChild(input);
+
+            state.cellElements.set(key, wrapper);
+            state.inputElements.set(key, input);
+
+            const number = state.normalizedEntries.find((entry) => entry.x === x && entry.y === y)?.number;
+            if (number) {
+              const numberEl = document.createElement("span");
+              numberEl.className = "number";
+              numberEl.textContent = number;
+              wrapper.appendChild(numberEl);
+            }
+          }
+
+          gridEl.appendChild(wrapper);
+        }
+      }
+
+      renderClues();
+      const firstEntry = state.normalizedEntries[0];
+      selectEntry(firstEntry.id, 0);
+      updateStats();
+    }
+
+    function renderClues() {
+      acrossCluesEl.innerHTML = "";
+      downCluesEl.innerHTML = "";
+
+      const sortedEntries = [...state.normalizedEntries].sort((a, b) => a.number - b.number);
+      for (const entry of sortedEntries) {
+        const clueEl = document.createElement("button");
+        clueEl.type = "button";
+        clueEl.className = "clue";
+        clueEl.dataset.entryId = entry.id;
+        clueEl.innerHTML = `
+          <span class="clue-label">${entry.number} ${entry.direction}</span>
+          <p class="clue-text">${entry.clue}</p>
+          <p class="clue-meta">${entry.answer.length} letters</p>
+        `;
+        clueEl.addEventListener("click", () => selectEntry(entry.id, 0));
+
+        if (entry.direction === "across") {
+          acrossCluesEl.appendChild(clueEl);
+        } else {
+          downCluesEl.appendChild(clueEl);
+        }
+      }
+    }
+
+    function handleCellInput(event) {
+      const input = event.target;
+      input.value = input.value.replace(/[^a-z]/gi, "").slice(0, 1).toUpperCase();
+      clearCellFeedback();
+      updateStats();
+
+      if (!input.value) {
+        return;
+      }
+
+      const key = input.dataset.key;
+      const entry = getSelectedEntryForKey(key);
+      if (!entry) {
+        return;
+      }
+
+      const index = getCellIndexInEntry(entry, key);
+      if (index < entry.answer.length - 1) {
+        focusCellByEntry(entry, index + 1);
+      }
+      updateStatus(`${entry.number} ${entry.direction}: ${entry.clue}`);
+    }
+
+    function handleCellKeyDown(event) {
+      const { key } = event;
+      const currentKey = event.target.dataset.key;
+
+      if (key === " " || key === "Spacebar") {
+        event.preventDefault();
+        toggleDirection(currentKey);
+        return;
+      }
+
+      if (key === "Backspace") {
+        clearCellFeedback();
+        if (!event.target.value) {
+          const entry = getSelectedEntryForKey(currentKey);
+          if (entry) {
+            const index = getCellIndexInEntry(entry, currentKey);
+            if (index > 0) {
+              event.preventDefault();
+              focusCellByEntry(entry, index - 1);
+              getInputByKey(getCellKeyForEntry(entry, index - 1)).value = "";
+            }
+          }
+        }
+        return;
+      }
+
+      if (key === "ArrowRight" || key === "ArrowLeft" || key === "ArrowDown" || key === "ArrowUp") {
+        event.preventDefault();
+        navigateByArrow(currentKey, key);
+      }
+    }
+
+    function navigateByArrow(currentKey, arrowKey) {
+      const [x, y] = currentKey.split(",").map(Number);
+      const next =
+        arrowKey === "ArrowRight" ? [x + 1, y] :
+        arrowKey === "ArrowLeft" ? [x - 1, y] :
+        arrowKey === "ArrowDown" ? [x, y + 1] :
+        [x, y - 1];
+
+      const nextKey = getCellKey(next[0], next[1]);
+      if (state.cellsByKey.has(nextKey)) {
+        selectCell(nextKey);
+        getInputByKey(nextKey).focus();
+      }
+    }
+
+    function selectCell(key) {
+      state.selectedCellKey = key;
+      const preferredEntry = getSelectedEntryForKey(key);
+      if (preferredEntry) {
+        state.selectedEntryId = preferredEntry.id;
+      } else {
+        const options = getEntriesForCell(key);
+        if (options.length > 0) {
+          state.selectedEntryId = options[0].id;
+          state.direction = options[0].direction;
+        }
+      }
+      highlightSelection();
+      updateStats();
+    }
+
+    function toggleDirection(key) {
+      const entriesForCell = getEntriesForCell(key);
+      if (entriesForCell.length < 2) {
+        return;
+      }
+      const current = getSelectedEntryForKey(key);
+      const next = entriesForCell.find((entry) => entry.id !== current.id) || entriesForCell[0];
+      state.direction = next.direction;
+      state.selectedEntryId = next.id;
+      state.selectedCellKey = key;
+      highlightSelection();
+      updateStats();
+      updateStatus(`${next.number} ${next.direction}: ${next.clue}`);
+    }
+
+    function selectEntry(entryId, index = 0) {
+      const entry = state.normalizedEntries.find((item) => item.id === entryId);
+      if (!entry) {
+        return;
+      }
+      state.selectedEntryId = entry.id;
+      state.direction = entry.direction;
+      const key = getCellKeyForEntry(entry, index);
+      state.selectedCellKey = key;
+      highlightSelection();
+      const input = getInputByKey(key);
+      if (input) {
+        input.focus();
+        input.select();
+      }
+      updateStats();
+      updateStatus(`${entry.number} ${entry.direction}: ${entry.clue}`);
+    }
+
+    function highlightSelection() {
+      for (const wrapper of state.cellElements.values()) {
+        wrapper.classList.remove("active", "matching");
+      }
+
+      document.querySelectorAll(".clue").forEach((clue) => clue.classList.remove("active"));
+
+      const activeEntry = state.normalizedEntries.find((entry) => entry.id === state.selectedEntryId);
+      if (!activeEntry) {
+        return;
+      }
+
+      const selectedKey = state.selectedCellKey;
+      for (const cell of getEntryCells(activeEntry)) {
+        const key = getCellKey(cell.x, cell.y);
+        const wrapper = state.cellElements.get(key);
+        if (wrapper) {
+          wrapper.classList.add("matching");
+        }
+      }
+
+      if (selectedKey) {
+        state.cellElements.get(selectedKey)?.classList.add("active");
+      }
+
+      document.querySelector(`.clue[data-entry-id="${activeEntry.id}"]`)?.classList.add("active");
+    }
+
+    function updateStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    function clearCellFeedback() {
+      for (const wrapper of state.cellElements.values()) {
+        wrapper.classList.remove("correct", "incorrect");
+      }
+    }
+
+    function updateStats() {
+      let filled = 0;
+      let solved = 0;
+      for (const key of state.cellsByKey.keys()) {
+        const value = getInputByKey(key)?.value || "";
+        if (value) {
+          filled += 1;
+        }
+      }
+
+      for (const entry of state.normalizedEntries) {
+        if (isEntrySolved(entry)) {
+          solved += 1;
+        }
+      }
+
+      const activeEntry = state.normalizedEntries.find((entry) => entry.id === state.selectedEntryId);
+      filledStatEl.textContent = `${filled} / ${state.cellsByKey.size} letters filled`;
+      solvedStatEl.textContent = `${solved} / ${state.normalizedEntries.length} words solved`;
+      selectedStatEl.textContent = activeEntry
+        ? `Selected: ${activeEntry.number} ${activeEntry.direction} (${activeEntry.answer.length})`
+        : "No clue selected";
+    }
+
+    function checkEntry(entry) {
+      let correct = 0;
+      for (const cell of getEntryCells(entry)) {
+        const key = getCellKey(cell.x, cell.y);
+        const wrapper = state.cellElements.get(key);
+        const input = getInputByKey(key);
+        if (!wrapper || !input) {
+          continue;
+        }
+
+        if (input.value.toUpperCase() === cell.letter) {
+          wrapper.classList.add("correct");
+          wrapper.classList.remove("incorrect");
+          correct += 1;
+        } else {
+          wrapper.classList.add("incorrect");
+          wrapper.classList.remove("correct");
+        }
+      }
+      return correct === entry.answer.length;
+    }
+
+    function isEntrySolved(entry) {
+      return getEntryCells(entry).every((cell) => {
+        const input = getInputByKey(getCellKey(cell.x, cell.y));
+        return input && input.value.toUpperCase() === cell.letter;
+      });
+    }
+
+    function revealEntry(entry) {
+      for (const cell of getEntryCells(entry)) {
+        const input = getInputByKey(getCellKey(cell.x, cell.y));
+        if (input) {
+          input.value = cell.letter;
+        }
+      }
+      clearCellFeedback();
+      checkEntry(entry);
+      updateStats();
+    }
+
+    function revealLetter() {
+      const entry = state.normalizedEntries.find((item) => item.id === state.selectedEntryId);
+      if (!entry) {
+        return;
+      }
+      const cells = getEntryCells(entry);
+      const next = cells.find((cell) => {
+        const input = getInputByKey(getCellKey(cell.x, cell.y));
+        return !input.value || input.value.toUpperCase() !== cell.letter;
+      }) || cells[0];
+
+      const key = getCellKey(next.x, next.y);
+      const input = getInputByKey(key);
+      if (input) {
+        input.value = next.letter;
+        state.selectedCellKey = key;
+        highlightSelection();
+        updateStats();
+        updateStatus(`Revealed one letter for ${entry.number} ${entry.direction}.`);
+      }
+    }
+
+    function getSelectedEntryForKey(key) {
+      const options = getEntriesForCell(key);
+      if (options.length === 0) {
+        return null;
+      }
+      return options.find((entry) => entry.id === state.selectedEntryId && entry.direction === state.direction)
+        || options.find((entry) => entry.direction === state.direction)
+        || options[0];
+    }
+
+    function getEntriesForCell(key) {
+      const cell = state.cellsByKey.get(key);
+      if (!cell) {
+        return [];
+      }
+      return cell.entries.map(({ entryId }) => state.normalizedEntries.find((entry) => entry.id === entryId));
+    }
+
+    function getCellIndexInEntry(entry, key) {
+      return getEntryCells(entry).findIndex((cell) => getCellKey(cell.x, cell.y) === key);
+    }
+
+    function getCellKeyForEntry(entry, index) {
+      const cell = getEntryCells(entry)[index];
+      return getCellKey(cell.x, cell.y);
+    }
+
+    function getInputByKey(key) {
+      return state.inputElements.get(key);
+    }
+
+    document.getElementById("check-word").addEventListener("click", () => {
+      clearCellFeedback();
+      const entry = state.normalizedEntries.find((item) => item.id === state.selectedEntryId);
+      if (!entry) {
+        return;
+      }
+      const solved = checkEntry(entry);
+      updateStatus(solved
+        ? `Nice work. ${entry.number} ${entry.direction} is correct.`
+        : `Keep going on ${entry.number} ${entry.direction}. Some letters still need attention.`);
+      updateStats();
+    });
+
+    document.getElementById("check-puzzle").addEventListener("click", () => {
+      clearCellFeedback();
+      let solvedCount = 0;
+      for (const entry of state.normalizedEntries) {
+        if (checkEntry(entry)) {
+          solvedCount += 1;
+        }
+      }
+      updateStatus(
+        solvedCount === state.normalizedEntries.length
+          ? "Puzzle complete. Every answer is correct."
+          : `${solvedCount} of ${state.normalizedEntries.length} words are fully correct so far.`
+      );
+      updateStats();
+    });
+
+    document.getElementById("reveal-letter").addEventListener("click", revealLetter);
+
+    document.getElementById("reveal-word").addEventListener("click", () => {
+      const entry = state.normalizedEntries.find((item) => item.id === state.selectedEntryId);
+      if (!entry) {
+        return;
+      }
+      revealEntry(entry);
+      updateStatus(`Revealed ${entry.number} ${entry.direction}.`);
+    });
+
+    document.getElementById("reset-puzzle").addEventListener("click", () => {
+      for (const key of state.cellsByKey.keys()) {
+        const input = getInputByKey(key);
+        if (input) {
+          input.value = "";
+        }
+      }
+      clearCellFeedback();
+      updateStats();
+      updateStatus("Puzzle reset. Ready for another round.");
+      const firstEntry = state.normalizedEntries[0];
+      selectEntry(firstEntry.id, 0);
+    });
+
+    render();
+  </script>
+</body>
+</html>
+
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<style id="phfy-page-system">
+/* Public Health for You shared blue mobile-first page system */
+:root{--phfy-ink:#102033;--phfy-muted:#536476;--phfy-line:#d7e4f2;--phfy-soft:#f3f8fd;--phfy-panel:#fff;--phfy-blue:#1769aa;--phfy-blue-dark:#0b3d66;--phfy-blue-soft:#e7f2fb;--phfy-sky:#5bb7df;--phfy-teal:#12848a;--phfy-shadow:0 18px 55px rgba(16,32,51,.13)}
+body{display:block!important;height:auto!important;min-height:100vh!important;background:radial-gradient(circle at top left,rgba(91,183,223,.15),transparent 32%),var(--phfy-soft)!important;color:var(--phfy-ink)!important;font-family:var(--wp--preset--font-family--literata),Georgia,serif!important;letter-spacing:0!important;line-height:1.65!important}.wp-site-blocks{background:#fff!important}.wp-site-blocks main,.wp-site-blocks .page,.wp-site-blocks .app,.wp-site-blocks .container,.wp-site-blocks .wrap,.wp-site-blocks .game-wrap,.wp-site-blocks .tool-wrap,.wp-site-blocks .calculator-wrap{box-sizing:border-box;width:min(1120px,calc(100vw - 32px))!important;max-width:1120px!important;margin:clamp(1.25rem,4vw,2.75rem) auto!important;padding:0!important}.wp-site-blocks .shell,.wp-site-blocks .card,.wp-site-blocks .panel,.wp-site-blocks .calculator,.wp-site-blocks .result-panel,.wp-site-blocks .slide,.wp-site-blocks .module,.wp-site-blocks .quiz,.wp-site-blocks .game,.wp-site-blocks .content-card{background:var(--phfy-panel)!important;border:1px solid var(--phfy-line)!important;border-radius:14px!important;box-shadow:var(--phfy-shadow)!important;color:var(--phfy-ink)!important}.wp-site-blocks .hero,.wp-site-blocks .page-header,.wp-site-blocks .tool-header,.wp-site-blocks .calculator-header,.wp-site-blocks header.hero{background:linear-gradient(180deg,rgba(23,105,170,.1),rgba(23,105,170,0)) #fff!important;border-bottom:1px solid var(--phfy-line)!important;color:var(--phfy-ink)!important;padding:clamp(1rem,3vw,1.85rem)!important}.wp-site-blocks h1,.wp-site-blocks h2,.wp-site-blocks h3,.wp-site-blocks h4,.wp-site-blocks h5,.wp-site-blocks h6{color:var(--phfy-blue-dark)!important;font-family:var(--wp--preset--font-family--beiruti),Arial,sans-serif!important;font-weight:750!important;letter-spacing:0!important;line-height:1.15!important}.wp-site-blocks p,.wp-site-blocks li,.wp-site-blocks td,.wp-site-blocks th,.wp-site-blocks label,.wp-site-blocks .subtext,.wp-site-blocks .field-note,.wp-site-blocks .hint,.wp-site-blocks .content p{color:var(--phfy-ink)!important;letter-spacing:0!important}.wp-site-blocks .subtext,.wp-site-blocks .field-note,.wp-site-blocks .hint,.wp-site-blocks .muted,.wp-site-blocks small{color:var(--phfy-muted)!important}.wp-site-blocks button,.wp-site-blocks input,.wp-site-blocks select,.wp-site-blocks textarea{font:inherit!important;letter-spacing:0!important}.wp-site-blocks input,.wp-site-blocks select,.wp-site-blocks textarea{background:#fff!important;border:1px solid var(--phfy-line)!important;border-radius:10px!important;color:var(--phfy-ink)!important;min-height:42px!important;padding:.65rem .75rem!important}.wp-site-blocks button,.wp-site-blocks .button,.wp-site-blocks .action,.wp-site-blocks .tab,.wp-site-blocks .controls button,.wp-site-blocks aside button,.wp-site-blocks .lang-toggle button{border-radius:999px!important;border:1px solid rgba(23,105,170,.24)!important;box-shadow:none!important;cursor:pointer;font-weight:700!important;min-height:42px!important;transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease,transform 160ms ease!important}.wp-site-blocks button:hover,.wp-site-blocks .button:hover,.wp-site-blocks .action:hover,.wp-site-blocks .tab:hover,.wp-site-blocks .controls button:hover,.wp-site-blocks aside button:hover{transform:translateY(-1px)}.wp-site-blocks button.action,.wp-site-blocks button.active,.wp-site-blocks .tab.active,.wp-site-blocks aside button.active,.wp-site-blocks .lang-toggle button.active,.wp-site-blocks .primary,.wp-site-blocks .wp-block-button__link{background:var(--phfy-blue-dark)!important;border-color:var(--phfy-blue-dark)!important;color:#fff!important}.wp-site-blocks button.secondary,.wp-site-blocks .action.secondary,.wp-site-blocks .tab:not(.active),.wp-site-blocks aside button:not(.active),.wp-site-blocks .controls button,.wp-site-blocks .lang-toggle button:not(.active){background:var(--phfy-blue-soft)!important;color:var(--phfy-blue-dark)!important}.wp-site-blocks table{border-collapse:separate!important;border-spacing:0!important;overflow:hidden;width:100%!important}.wp-site-blocks th{background:var(--phfy-blue-soft)!important;color:var(--phfy-blue-dark)!important;font-weight:750!important}.wp-site-blocks th,.wp-site-blocks td{border-color:var(--phfy-line)!important}.wp-site-blocks .graphic,.wp-site-blocks .illustration,.wp-site-blocks .icon-panel{background:var(--phfy-blue-soft)!important}.wp-site-blocks .graphic svg,.wp-site-blocks .illustration svg,.wp-site-blocks svg{stroke:var(--phfy-blue-dark)}.wp-site-blocks aside{background:#f6faff!important;border-color:var(--phfy-line)!important;color:var(--phfy-ink)!important}.wp-site-blocks .controls,.wp-site-blocks footer{background:#fff!important;border-color:var(--phfy-line)!important;color:var(--phfy-muted)!important}.wp-site-blocks iframe,.wp-site-blocks canvas,.wp-site-blocks video{max-width:100%!important}@media(max-width:781px){.wp-site-blocks main,.wp-site-blocks .page,.wp-site-blocks .app,.wp-site-blocks .container,.wp-site-blocks .wrap,.wp-site-blocks .game-wrap,.wp-site-blocks .tool-wrap,.wp-site-blocks .calculator-wrap{width:min(100vw - 16px,100%)!important;margin:.85rem auto!important}.wp-site-blocks .hero,.wp-site-blocks .page-header,.wp-site-blocks .tool-header,.wp-site-blocks .calculator-header,.wp-site-blocks header.hero{padding:1rem!important}.wp-site-blocks .shell,.wp-site-blocks .card,.wp-site-blocks .panel,.wp-site-blocks .calculator,.wp-site-blocks .result-panel,.wp-site-blocks .slide,.wp-site-blocks .module,.wp-site-blocks .quiz,.wp-site-blocks .game,.wp-site-blocks .content-card{border-radius:10px!important}.wp-site-blocks aside{width:100%!important}.wp-site-blocks .content{padding:1.15rem!important;width:100%!important}.wp-site-blocks .graphic{width:100%!important;min-height:150px}.wp-site-blocks .controls{display:grid!important;gap:.65rem!important;padding:.85rem!important}.wp-site-blocks .controls button{margin:0!important;width:100%!important}.wp-site-blocks h1{font-size:clamp(1.35rem,7vw,2rem)!important}.wp-site-blocks h2{font-size:clamp(1.2rem,5.5vw,1.65rem)!important}.wp-site-blocks p,.wp-site-blocks li{font-size:1rem!important}}
+</style>
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<style id="phfy-force-blue-mobile">
+/* Final blue health consistency layer */
+.wp-site-blocks{--gov:#1769aa!important;--tab-active:#1769aa!important;--tab-active-ink:#fff!important;--accent:#1769aa!important;--accent-soft:#e7f2fb!important;--panel:#fff!important;--bg:#f3f8fd!important;--line:#d7e4f2!important;--text:#102033!important;--muted:#536476!important;--step-bg:#e7f2fb!important;color:#102033!important;background:#fff!important}.wp-site-blocks *{box-sizing:border-box}.wp-site-blocks article,.wp-site-blocks section,.wp-site-blocks main,.wp-site-blocks .page,.wp-site-blocks .shell,.wp-site-blocks .container,.wp-site-blocks .app,.wp-site-blocks .wrap{border-color:#d7e4f2!important}.wp-site-blocks .shell,.wp-site-blocks .panel,.wp-site-blocks .card,.wp-site-blocks .calculator,.wp-site-blocks .result-panel,.wp-site-blocks .game,.wp-site-blocks .module,.wp-site-blocks .slide,.wp-site-blocks .quiz,.wp-site-blocks .crossword,.wp-site-blocks .board-panel,.wp-site-blocks .input-panel,.wp-site-blocks .output-panel{background:#fff!important;border:1px solid #d7e4f2!important;border-radius:14px!important;box-shadow:0 18px 55px rgba(16,32,51,.13)!important}.wp-site-blocks .hero,.wp-site-blocks .page-header,.wp-site-blocks .tool-header,.wp-site-blocks .calculator-header,.wp-site-blocks .header,.wp-site-blocks header:not(.wp-block-template-part){background:linear-gradient(180deg,rgba(23,105,170,.1),rgba(23,105,170,0)) #fff!important;border-color:#d7e4f2!important;color:#102033!important}.wp-site-blocks h1,.wp-site-blocks h2,.wp-site-blocks h3,.wp-site-blocks .title,.wp-site-blocks .section-title{color:#0b3d66!important;letter-spacing:0!important}.wp-site-blocks p,.wp-site-blocks li,.wp-site-blocks label,.wp-site-blocks span,.wp-site-blocks td{letter-spacing:0!important}.wp-site-blocks .graphic,.wp-site-blocks .illustration,.wp-site-blocks .icon-panel,.wp-site-blocks .result-summary,.wp-site-blocks .step-col,.wp-site-blocks th,.wp-site-blocks .accordion-toggle{background:#e7f2fb!important;color:#0b3d66!important}.wp-site-blocks svg{stroke:#0b3d66}.wp-site-blocks button,.wp-site-blocks .button,.wp-site-blocks .btn,.wp-site-blocks .action,.wp-site-blocks .tab,.wp-site-blocks .controls button,.wp-site-blocks .lang-toggle button,.wp-site-blocks aside button{border-radius:999px!important;border:1px solid rgba(23,105,170,.25)!important;font-weight:700!important}.wp-site-blocks button.active,.wp-site-blocks .active,.wp-site-blocks .tab.active,.wp-site-blocks .action:not(.secondary),.wp-site-blocks .primary,.wp-site-blocks aside button.active,.wp-site-blocks .lang-toggle button.active{background:#0b3d66!important;border-color:#0b3d66!important;color:#fff!important}.wp-site-blocks button.secondary,.wp-site-blocks .secondary,.wp-site-blocks .tab:not(.active),.wp-site-blocks .controls button,.wp-site-blocks aside button:not(.active),.wp-site-blocks .lang-toggle button:not(.active){background:#e7f2fb!important;color:#0b3d66!important}.wp-site-blocks input,.wp-site-blocks select,.wp-site-blocks textarea{border:1px solid #d7e4f2!important;border-radius:10px!important;background:#fff!important;color:#102033!important}.wp-site-blocks table{border-color:#d7e4f2!important}.wp-site-blocks aside{background:#f6faff!important;border-color:#d7e4f2!important}.wp-site-blocks footer,.wp-site-blocks .footer,.wp-site-blocks .controls{background:#fff!important;border-color:#d7e4f2!important;color:#536476!important}@media(max-width:781px){.wp-site-blocks main,.wp-site-blocks .page,.wp-site-blocks .container,.wp-site-blocks .app,.wp-site-blocks .wrap{width:min(100vw - 14px,100%)!important;max-width:100%!important;margin:.75rem auto!important}.wp-site-blocks .shell,.wp-site-blocks .panel,.wp-site-blocks .card,.wp-site-blocks .calculator,.wp-site-blocks .result-panel,.wp-site-blocks .game,.wp-site-blocks .module,.wp-site-blocks .slide{border-radius:10px!important}.wp-site-blocks .slide,.wp-site-blocks .calc-layout,.wp-site-blocks .layout,.wp-site-blocks .grid,.wp-site-blocks .content-row{grid-template-columns:1fr!important;flex-direction:column!important}.wp-site-blocks aside{width:100%!important;max-width:100%!important;display:flex!important;overflow-x:auto!important}.wp-site-blocks aside button{min-width:220px!important}.wp-site-blocks .graphic,.wp-site-blocks .content{width:100%!important}.wp-site-blocks .content{padding:1rem!important}.wp-site-blocks .controls{display:grid!important;grid-template-columns:1fr!important;gap:.65rem!important;padding:.8rem!important}.wp-site-blocks .controls button{width:100%!important;margin:0!important}.wp-site-blocks h1{font-size:clamp(1.35rem,7vw,2rem)!important}.wp-site-blocks h2{font-size:clamp(1.2rem,5.5vw,1.65rem)!important}.wp-site-blocks p,.wp-site-blocks li,.wp-site-blocks td,.wp-site-blocks label{font-size:1rem!important}}
+</style>
+<!-- /wp:html -->

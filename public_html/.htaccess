@@ -1,0 +1,13 @@
+DirectoryIndex index.php frontpage.html
+
+Options -Indexes
+
+RewriteEngine On
+
+RewriteRule ^(config|src|sql|storage)(/|$) - [F,L]
+RewriteRule ^bht/(config|src|sql|storage)(/|$) - [F,L]
+RewriteRule ^public/(.*)$ public/$1 [L]
+
+<FilesMatch "^\.(env|git|htaccess)">
+    Require all denied
+</FilesMatch>

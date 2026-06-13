@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS users (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(120) NOT NULL,
+    username VARCHAR(60) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('super_admin', 'collector') NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS surveys (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    collector_id INT UNSIGNED NOT NULL,
+    team_no VARCHAR(50) DEFAULT NULL,
+    investigator_name VARCHAR(120) DEFAULT NULL,
+    visit_date DATE DEFAULT NULL,
+    village_name VARCHAR(120) DEFAULT NULL,
+    locality_name VARCHAR(120) DEFAULT NULL,
+    head_name VARCHAR(120) DEFAULT NULL,
+    informant_name VARCHAR(120) DEFAULT NULL,
+    household_member_count INT DEFAULT NULL,
+    payload_json LONGTEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_surveys_collector FOREIGN KEY (collector_id) REFERENCES users(id)
+);
