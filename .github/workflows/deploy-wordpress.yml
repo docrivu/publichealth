@@ -2,11 +2,16 @@ name: Deploy WordPress pages
 
 on:
   workflow_dispatch:
+    inputs:
+      page_files:
+        description: "Optional page files to deploy, separated by commas or new lines. Example: wordpress/pages/calculator.html"
+        required: false
+        type: string
   push:
     branches:
       - main
     paths:
-      - "wordpress/**"
+      - "wordpress/pages/*.html"
       - "scripts/wp-*.mjs"
       - ".github/workflows/deploy-wordpress.yml"
 
@@ -16,16 +21,47 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
+      - name: Determine WordPress pages to deploy
+        id: changed-pages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.page_files }}" ]; then
+            printf '%s\n' "${{ inputs.page_files }}" | tr ', ' '\n' | sed '/^$/d' > /tmp/wp-pages.txt
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- 'wordpress/pages/*.html' > /tmp/wp-pages.txt
+          else
+            : > /tmp/wp-pages.txt
+          fi
+
+          {
+            echo "files<<EOF"
+            cat /tmp/wp-pages.txt
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ ! -s /tmp/wp-pages.txt ]; then
+            echo "No WordPress page files changed."
+          else
+            echo "WordPress page files to deploy:"
+            cat /tmp/wp-pages.txt
+          fi
+
       - name: Deploy pages to WordPress
+        if: steps.changed-pages.outputs.files != ''
         env:
           WP_BASE_URL: ${{ secrets.WP_BASE_URL }}
           WP_USERNAME: ${{ secrets.WP_USERNAME }}
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           WP_ALLOW_INSECURE_TLS: ${{ secrets.WP_ALLOW_INSECURE_TLS }}
+          WP_DEPLOY_FILES: ${{ steps.changed-pages.outputs.files }}
         run: npm run wp:deploy
