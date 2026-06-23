@@ -32,7 +32,7 @@ async function main() {
     const content = await readFile(new URL(page.file, wordpressDir), "utf8");
     await wpRequest(config, `/pages/${page.id}`, {
       method: "POST",
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ content, title: page.title }),
     });
     console.log(`Updated ${page.slug} (${page.id})`);
   }
