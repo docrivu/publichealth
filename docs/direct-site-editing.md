@@ -1,26 +1,12 @@
 # Direct Site Editing
 
-`rivubasu.com` is no longer intended to publish WordPress page changes through GitHub Actions.
+GitHub now publishes changes to `rivubasu.com`. See [github-deploy.md](github-deploy.md).
 
-## Current Rule
+Editing directly in WordPress (`https://rivubasu.com/wp-admin/`) or Hostinger
+still works:
 
-Make live site changes directly in WordPress, Hostinger, or the live server file manager/FTP. Do not rely on GitHub commits to publish WordPress pages.
-
-## WordPress Pages
-
-1. Go to `https://rivubasu.com/wp-admin/`.
-2. Open **Pages**.
-3. Edit the page directly in WordPress.
-4. Click **Update**.
-
-Those changes are live immediately.
-
-## Server Files
-
-For files under `public_html`, make changes directly through Hostinger file manager, FTP, or the live server upload path.
-
-## Local Repository
-
-This repository can still be used as a reference or backup, but pushing to GitHub should not be treated as a deployment step for the website.
-
-The old GitHub Actions WordPress deployment workflow has been removed.
+- **WordPress page edits** are copied back into GitHub every night by the
+  *Sync from WordPress* workflow, or right away if you run it from the Actions tab.
+- **Server files changed in Hostinger's file manager** are not synced back
+  automatically. Make the same change in `public_html/` in GitHub, or the next
+  GitHub deploy of that file will overwrite it.

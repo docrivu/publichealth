@@ -1,0 +1,123 @@
+name: Deploy site
+
+# Publishes what changed on `main` to rivubasu.com:
+#   wordpress/pages/*.html  -> WordPress pages (REST API, application password)
+#   public_html/**          -> server files (FTPS to Hostinger)
+# Only files changed in the push are sent. Nothing is ever deleted on the server.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "wordpress/pages/*.html"
+      - "public_html/**"
+  workflow_dispatch:
+    inputs:
+      page_files:
+        description: "WordPress pages to publish (comma/new-line separated), e.g. wordpress/pages/games-2.html"
+        required: false
+        type: string
+      server_files:
+        description: "Server files to upload (comma/new-line separated), e.g. public_html/tools/posh-game.html"
+        required: false
+        type: string
+      force:
+        description: "Overwrite WordPress pages even if they were edited in wp-admin since the last sync"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-site
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Work out what changed
+        id: changed
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          IN_PAGES: ${{ inputs.page_files }}
+          IN_FILES: ${{ inputs.server_files }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            printf '%s\n' "$IN_PAGES" | tr ',' '\n' | sed 's/^ *//;s/ *$//;/^$/d' > /tmp/pages.txt
+            printf '%s\n' "$IN_FILES" | tr ',' '\n' | sed 's/^ *//;s/ *$//;/^$/d' > /tmp/files.txt
+            echo "before=" >> "$GITHUB_OUTPUT"
+          elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "New branch push: nothing to compare against, so nothing is deployed."
+            : > /tmp/pages.txt; : > /tmp/files.txt
+            echo "before=" >> "$GITHUB_OUTPUT"
+          else
+            git diff --name-only --diff-filter=AMR "$BEFORE" "$AFTER" -- 'wordpress/pages/*.html' > /tmp/pages.txt
+            git diff --name-only --diff-filter=AMR "$BEFORE" "$AFTER" -- 'public_html' > /tmp/files.txt
+            echo "before=$BEFORE" >> "$GITHUB_OUTPUT"
+            removed=$(git diff --name-only --diff-filter=D "$BEFORE" "$AFTER" -- 'public_html' || true)
+            if [ -n "$removed" ]; then
+              echo "::notice::Files deleted in Git are NOT deleted on the server. Remove them in Hostinger if needed:%0A${removed//$'\n'/%0A}"
+            fi
+          fi
+          # server files are relative to public_html/; skip docs
+          sed -i 's#^public_html/##;/\.md$/d' /tmp/files.txt
+          echo "--- WordPress pages:"; cat /tmp/pages.txt
+          echo "--- Server files:";   cat /tmp/files.txt
+          { echo "pages<<EOF"; cat /tmp/pages.txt; echo "EOF"; } >> "$GITHUB_OUTPUT"
+          { echo "files<<EOF"; cat /tmp/files.txt; echo "EOF"; } >> "$GITHUB_OUTPUT"
+
+      - name: Save previous page versions (for the conflict check)
+        if: steps.changed.outputs.pages != '' && steps.changed.outputs.before != ''
+        shell: bash
+        env:
+          BEFORE: ${{ steps.changed.outputs.before }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/previous
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            if git cat-file -e "$BEFORE:$f" 2>/dev/null; then
+              mkdir -p "/tmp/previous/$(dirname "$f")"
+              git show "$BEFORE:$f" > "/tmp/previous/$f"
+            fi
+          done < /tmp/pages.txt
+
+      - uses: actions/setup-node@v4
+        if: steps.changed.outputs.pages != ''
+        with:
+          node-version: "20"
+
+      - name: Publish WordPress pages
+        if: steps.changed.outputs.pages != ''
+        env:
+          WP_BASE_URL: ${{ secrets.WP_BASE_URL }}
+          WP_USERNAME: ${{ secrets.WP_USERNAME }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          WP_ALLOW_INSECURE_TLS: ${{ secrets.WP_ALLOW_INSECURE_TLS || 'false' }}
+          WP_DEPLOY_FILES: ${{ steps.changed.outputs.pages }}
+          WP_PREVIOUS_DIR: ${{ steps.changed.outputs.before != '' && '/tmp/previous' || '' }}
+          WP_FORCE: ${{ inputs.force && 'true' || 'false' }}
+        run: npm run wp:deploy
+
+      - name: Upload server files
+        if: steps.changed.outputs.files != ''
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SECURE: ${{ secrets.FTP_SECURE || 'true' }}
+          FTP_REMOTE_ROOT: ${{ secrets.FTP_REMOTE_ROOT || 'public_html' }}
+          FTP_LOCAL_ROOT: public_html
+          FTP_FILES: ${{ steps.changed.outputs.files }}
+        run: python3 tools/ftp_upload.py
