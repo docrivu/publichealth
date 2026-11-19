@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POSH Smart Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f1ea; --ink:#1f1a17; --muted:#6b625b; --card:#fffdf9; --line:#e6ddd2;
+  --accent:#b23a48; --accent-soft:#f6dfe2; --ok:#2f7a5b; --ok-soft:#dcefe6; --bad:#b4442c; --bad-soft:#f7e1da;
+  --gold:#c98b1b; --gold-soft:#f8ecd2; --blue:#2f5d8a; --blue-soft:#dde8f3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;justify-content:center;padding:18px 12px 60px;-webkit-tap-highlight-color:transparent}
+.wrap{width:100%;max-width:580px}
+h1,h2,h3,.serif{font-family:Fraunces,Georgia,serif}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px 18px;box-shadow:0 8px 30px -18px rgba(60,30,20,.35)}
+.btn{width:100%;font:inherit;font-weight:700;font-size:16px;padding:15px;border:0;border-radius:14px;background:var(--ink);color:#fff;cursor:pointer;margin-top:16px}
+.btn.accent{background:var(--accent)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--muted)}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 12px}
+.back{background:none;border:0;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;padding:6px 0}
+.lvtag{display:inline-block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:5px 10px;border-radius:99px;margin-bottom:10px}
+.lvtitle{font-family:Fraunces,serif;font-size:24px;font-weight:700;line-height:1.2;margin-bottom:6px}
+.lvhelp{color:var(--muted);font-size:14px;line-height:1.5;margin-bottom:16px}
+
+/* Map */
+.hero{text-align:center;margin-bottom:18px}
+.hero .badge{width:70px;height:70px;margin:4px auto 14px;border-radius:20px;background:var(--accent);display:grid;place-items:center;color:#fff;font-family:Fraunces,serif;font-size:28px;font-weight:800;transform:rotate(-4deg)}
+.hero h1{font-size:32px;line-height:1.1;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:14.5px;line-height:1.5}
+.total{display:flex;gap:8px;justify-content:center;margin:14px 0 4px}
+.total .pill{color:var(--ink)}
+.map{display:grid;gap:10px}
+.tile{display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;text-align:left;font:inherit;color:var(--ink);transition:transform .1s,border-color .15s}
+.tile:hover:not(:disabled){transform:translateY(-1px);border-color:var(--accent)}
+.tile:disabled{opacity:.45;cursor:default}
+.tile .ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;flex:none;background:var(--accent-soft)}
+.tile .tx{flex:1}
+.tile .tx b{display:block;font-size:15.5px;margin-bottom:2px}
+.tile .tx small{color:var(--muted);font-size:12.5px}
+.tile .st{font-size:15px;letter-spacing:1px;color:var(--gold);white-space:nowrap}
+.tile.next{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+
+/* Drag cards */
+.chip{touch-action:none;user-select:none;-webkit-user-select:none;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;line-height:1.35;cursor:grab;font-weight:500;transition:border-color .15s,opacity .15s}
+.chip.selected{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.chip.lifting{opacity:.25}
+.chip.locked{cursor:default;font-size:12.5px;padding:8px 10px}
+.dragghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;box-shadow:0 14px 30px -10px rgba(0,0,0,.35);border-color:var(--accent)}
+.pool{display:grid;gap:8px;min-height:20px}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 -6px 14px;padding:8px 6px;position:sticky;top:0;z-index:5;background:var(--card)}
+.bin{border:2px dashed var(--line);border-radius:16px;padding:12px 8px;min-height:96px;transition:background .15s,border-color .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:#fff}
+.bin .n{font-family:Fraunces,serif;font-size:28px;font-weight:800;line-height:1}
+.bin.yes .n{color:var(--bad)} .bin.no .n{color:var(--ok)}
+.bin.flash{animation:flash .5s}
+@keyframes flash{50%{transform:scale(1.06)}}
+.bin h4{font-size:13px;text-align:center;margin-bottom:4px;font-weight:700}
+.bin.yes h4{color:var(--bad)} .bin.no h4{color:var(--ok)}
+.bin.hover,.slot.hover{background:var(--gold-soft);border-color:var(--gold)}
+.bin.yes .chip{background:var(--bad-soft);border-color:transparent}
+.bin.no .chip{background:var(--ok-soft);border-color:transparent}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+/* Committee */
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.slot{border:2px dashed var(--line);border-radius:14px;padding:10px;min-height:96px;display:flex;flex-direction:column;gap:6px;transition:background .15s}
+.slot h5{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.slot.filled{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.slot.filled .chip{background:transparent;border:0;padding:0}
+.person b{display:block;font-size:14px}
+.person span{font-size:12.5px;color:var(--muted)}
+
+/* Chat */
+.phone{background:#ece5dd;border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+.phone .who{font-size:12px;font-weight:700;color:var(--muted);text-align:center;padding:2px 0 6px}
+.msg{max-width:84%;padding:9px 12px;border-radius:14px;font-size:14px;line-height:1.4;position:relative;border:2px solid transparent;transition:border-color .15s,background .15s}
+.msg.them{background:#fff;align-self:flex-start;border-top-left-radius:4px;cursor:pointer}
+.msg.me{background:#d9fdd3;align-self:flex-end;border-top-right-radius:4px}
+.msg.flagged{border-color:var(--bad);background:#fff4f1}
+.msg.flagged::after{content:"🚩";position:absolute;right:-10px;top:-10px;font-size:16px}
+.msg.res-hit{border-color:var(--ok);background:var(--ok-soft)}
+.msg.res-miss{border-color:var(--gold);background:var(--gold-soft)}
+.msg.res-false{border-color:var(--bad);background:var(--bad-soft)}
+.msg .why{display:block;font-size:12px;color:var(--muted);margin-top:6px;font-weight:600}
+
+/* Order */
+.olist{list-style:none;display:grid;gap:8px;counter-reset:s}
+.olist li{touch-action:none;user-select:none;-webkit-user-select:none;display:flex;gap:10px;align-items:center;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;line-height:1.35;cursor:grab;counter-increment:s}
+.olist li::before{content:counter(s);font-family:Fraunces,serif;font-weight:800;color:var(--accent);width:22px;flex:none;text-align:center}
+.olist li .h{margin-left:auto;color:var(--muted);font-size:18px;letter-spacing:-2px}
+.olist li.dragging{border-color:var(--accent);box-shadow:0 10px 24px -10px rgba(0,0,0,.3);background:var(--accent-soft)}
+.olist li.good{border-color:var(--ok);background:var(--ok-soft)}
+.olist li.badpos{border-color:var(--bad);background:var(--bad-soft)}
+.olist li small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+
+/* Match */
+.match{display:grid;grid-template-columns:1.25fr 1fr;gap:10px}
+.match .col{display:grid;gap:8px;align-content:start}
+.mbtn{font:inherit;font-size:13.5px;font-weight:600;padding:12px 10px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;text-align:left;line-height:1.3;min-height:52px}
+.match .col.r .mbtn{text-align:center;font-family:Fraunces,serif;font-size:16px}
+.mbtn.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.mbtn.done{cursor:default;border-color:transparent}
+
+/* Quick fire */
+.q{font-family:Fraunces,serif;font-size:20px;line-height:1.3;font-weight:600;margin-bottom:14px}
+.timer{height:5px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:16px}
+.timer i{display:block;height:100%;background:var(--gold);width:100%}
+.opts{display:grid;gap:9px}
+.opt{font:inherit;font-size:14.5px;font-weight:500;text-align:left;padding:13px 15px;border-radius:13px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt.dim{opacity:.45}
+.fb{margin-top:14px;padding:13px 15px;border-radius:13px;font-size:14px;line-height:1.5}
+.fb.ok{background:var(--ok-soft)} .fb.no{background:var(--bad-soft)}
+.ref{display:block;margin-top:6px;font-size:11.5px;color:var(--muted);font-weight:700}
+
+/* Toast + result */
+.toast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,140%);width:min(540px,calc(100% - 24px));padding:13px 16px;border-radius:14px;font-size:14px;line-height:1.45;z-index:70;transition:transform .3s cubic-bezier(.2,.9,.3,1.2);box-shadow:0 12px 30px -12px rgba(0,0,0,.4)}
+.toast.show{transform:translate(-50%,0)}
+.toast.ok{background:#173d2e;color:#e4f5ec} .toast.no{background:#5a1f13;color:#fbe7e1}
+.toast b{display:block;margin-bottom:2px}
+.toast .ref{color:inherit;opacity:.7}
+.result{text-align:center}
+.stars{font-size:40px;letter-spacing:6px;color:var(--gold);margin:6px 0}
+.stars .off{color:var(--line)}
+.big{font-family:Fraunces,serif;font-size:52px;font-weight:800;line-height:1}
+.learn{text-align:left;margin-top:16px;display:grid;gap:8px}
+.learn div{font-size:13.5px;line-height:1.45;background:#fff;border-left:3px solid var(--accent);padding:10px 12px;border-radius:0 10px 10px 0}
+.pop{position:fixed;left:50%;top:38%;transform:translateX(-50%);font-family:Fraunces,serif;font-weight:800;font-size:30px;color:var(--ok);pointer-events:none;opacity:0;z-index:80}
+.pop.go{animation:float .9s ease forwards}
+@keyframes float{0%{opacity:0;transform:translate(-50%,10px)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-50px)}}
+.confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:90;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
+.namecard{display:grid;gap:8px}
+.namecard label{font-family:Fraunces,serif;font-size:20px;font-weight:700}
+.namecard input{font:inherit;font-size:17px;padding:14px 15px;border:1.5px solid var(--line);border-radius:13px;background:#fff;color:var(--ink);width:100%}
+.namecard input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.namecard small{font-size:12.5px;color:var(--muted)} .namecard small.err{color:var(--bad);font-weight:600}
+.namecard .btn{margin-top:6px}
+.playerbar{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;margin-bottom:6px;color:var(--muted)}
+.playerbar b{color:var(--ink)}
+.link{background:none;border:0;font:inherit;font-weight:700;color:var(--accent);cursor:pointer;padding:4px}
+.board{list-style:none;display:grid;gap:6px}
+.board li{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14.5px}
+.board li.me{border-color:var(--accent);background:var(--accent-soft)}
+.board .rk{width:28px;text-align:center;font-family:Fraunces,serif;font-weight:800;color:var(--muted);font-size:16px}
+.board .nm{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .nm em{font-style:normal;color:var(--accent);font-weight:700;font-size:12.5px}
+.board .sc{color:var(--gold);font-size:13px;white-space:nowrap} .board .sc b{color:var(--ink);font-size:15px}
+.board li.gap,.board li.empty{justify-content:center;border:0;background:none;color:var(--muted)}
+.rankline{margin-top:14px;font-size:15px;line-height:1.5}
+.foot a{color:var(--accent);font-weight:600;text-decoration:none}
+.foot{margin-top:16px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+.counter{font-size:13px;font-weight:700;color:var(--muted);margin-top:10px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast"></div>
+<div class="pop" id="pop"></div>
+<script>
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const app=$('#app');
+const edge=y=>{if(y>innerHeight-70)scrollBy(0,12);else if(y<70)scrollBy(0,-12);};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+let toastT;
+function toast(ok,title,body,ref){
+  const t=$('#toast');t.className='toast show '+(ok?'ok':'no');
+  t.innerHTML=`<b>${title}</b>${body||''}${ref?`<span class="ref">${ref}</span>`:''}`;
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3800);
+}
+function pop(txt){const p=$('#pop');p.textContent=txt;p.classList.remove('go');void p.offsetWidth;p.classList.add('go');}
+function shake(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+function confetti(){const c=['#b23a48','#c98b1b','#2f7a5b','#2f5d8a'];for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=c[i%4];d.style.animationDuration=(1.6+Math.random()*1.4)+'s';d.style.animationDelay=Math.random()*.4+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),3500);}}
+const starsOf=s=>s>=90?3:s>=60?2:s>0?1:0;
+const starStr=n=>'★'.repeat(n)+'<span class="off">'+'★'.repeat(3-n)+'</span>';
+
+/* Drag-and-drop engine: pointer events (mouse + touch), plus tap-to-select / tap-to-drop */
+function dnd(root,onDrop){
+  let selected=null;
+  root.querySelectorAll('[data-card]').forEach(card=>{
+    card.addEventListener('pointerdown',e=>{
+      if(card.classList.contains('locked'))return;
+      e.preventDefault();
+      const sx=e.clientX,sy=e.clientY,rect=card.getBoundingClientRect();
+      let ghost=null,over=null;
+      const move=ev=>{
+        const dx=ev.clientX-sx,dy=ev.clientY-sy;
+        if(!ghost&&Math.hypot(dx,dy)>6){
+          ghost=card.cloneNode(true);ghost.classList.add('dragghost');ghost.classList.remove('selected');
+          ghost.style.width=rect.width+'px';document.body.appendChild(ghost);card.classList.add('lifting');
+        }
+        if(ghost){edge(ev.clientY);
+          ghost.style.transform=`translate(${rect.left+dx}px,${rect.top+dy}px) rotate(2deg)`;
+          const z=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('[data-zone]');
+          if(z!==over){over?.classList.remove('hover');over=z;over?.classList.add('hover');}
+        }
+      };
+      const up=()=>{
+        window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);
+        if(ghost){ghost.remove();card.classList.remove('lifting');over?.classList.remove('hover');
+          if(selected){selected.classList.remove('selected');selected=null;}
+          if(over)onDrop(card,over);}
+        else{ // tap
+          if(selected===card){card.classList.remove('selected');selected=null;}
+          else{selected?.classList.remove('selected');selected=card;card.classList.add('selected');}
+        }
+      };
+      window.addEventListener('pointermove',move);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+    });
+  });
+  root.querySelectorAll('[data-zone]').forEach(z=>z.addEventListener('click',e=>{
+    if(!selected||e.target.closest('[data-card]'))return;
+    const c=selected;c.classList.remove('selected');selected=null;onDrop(c,z);
+  }));
+}
+
+/* ---------- game state ---------- */
+const LEVELS=[
+ {id:'sort', icon:'🗂️', name:'Spot It', sub:'Drag behaviours into the right bin'},
+ {id:'chat', icon:'🚩', name:'Red Flags', sub:'Tap the messages that cross the line'},
+ {id:'ic',   icon:'🏛️', name:'Build the Committee', sub:'Drag the right people into each seat'},
+ {id:'order',icon:'🧭', name:'Complaint Journey', sub:'Drag the steps into the right order'},
+ {id:'match',icon:'⏱️', name:'Beat the Clock', sub:'Match each step to its time limit'},
+ {id:'quick',icon:'⚡', name:'Final Call', sub:'Fast decisions, against the timer'},
+];
+/* ---------- player, progress & leaderboard ---------- */
+const API='posh-leaderboard.php';           // sits next to this file on the server
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v);}catch(e){return d;}},
+             set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const newId=()=>{const a=new Uint8Array(12);(crypto.getRandomValues?crypto.getRandomValues(a):a.forEach((_,i)=>a[i]=Math.random()*256|0));return [...a].map(b=>b.toString(16).padStart(2,'0')).join('');};
+let player=store.get('posh-player',null);
+let scores=Array(LEVELS.length).fill(null);
+function loadScores(){const s=player&&store.get('posh-scores-'+player.id,null);scores=Array.isArray(s)&&s.length===LEVELS.length?s:Array(LEVELS.length).fill(null);}
+const save=()=>{if(player)store.set('posh-scores-'+player.id,scores);};
+loadScores();
+
+let sharedBoard=null; // true when the server leaderboard answered
+async function boardTop(){
+  try{
+    const r=await fetch(API+'?action=top'+(player?'&id='+player.id:''),{cache:'no-store'});
+    const j=await r.json();if(!r.ok||!Array.isArray(j.entries))throw 0;
+    sharedBoard=true;return j;
+  }catch(e){
+    sharedBoard=false;
+    const rows=Object.values(store.get('posh-local-board',{})).sort((a,b)=>b.score-a.score||b.stars-a.stars||a.at-b.at);
+    const entries=rows.slice(0,50).map((r,k)=>({rank:k+1,name:r.name,score:r.score,stars:r.stars,me:player&&r.id===player.id}));
+    return {entries};
+  }
+}
+async function boardSubmit(){
+  const body={id:player.id,name:player.name,levels:scores.map(s=>s||0)};
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'failed');
+    sharedBoard=true;return j;
+  }catch(e){
+    sharedBoard=false;
+    const b=store.get('posh-local-board',{}),score=body.levels.reduce((a,c)=>a+c,0),stars=body.levels.reduce((a,c)=>a+starsOf(c),0);
+    if(!b[player.id]||score>b[player.id].score)b[player.id]={id:player.id,name:player.name,score,stars,at:Date.now()};
+    b[player.id].name=player.name;store.set('posh-local-board',b);
+    const rows=Object.values(b).sort((a,c)=>c.score-a.score||c.stars-a.stars||a.at-c.at);
+    return {ok:true,rank:rows.findIndex(r=>r.id===player.id)+1,best:b[player.id].score};
+  }
+}
+
+/* ---------- name screen ---------- */
+function nameScreen(){
+  app.innerHTML=`
+   <div class="hero"><div class="badge">P</div><h1>POSH Smart Check</h1>
+   <p>Six quick levels on preventing sexual harassment at the workplace, based on the POSH Act, 2013 and NIMI's POSH guidelines.</p></div>
+   <form class="card namecard" id="nf">
+     <label for="nm">What should we call you?</label>
+     <input id="nm" maxlength="24" autocomplete="nickname" placeholder="Your name" value="${player?esc(player.name):''}">
+     <small id="nerr">This name appears on the public leaderboard.</small>
+     <button class="btn accent" type="submit">Start playing →</button>
+     <button class="btn ghost" type="button" onclick="leaderboard()">🏆 View leaderboard</button>
+   </form>
+   <div class="foot"><a href="https://rivubasu.com/games-2/">← More learning games on rivubasu.com</a></div>`;
+  const nm=$('#nm');nm.focus();
+  $('#nf').onsubmit=e=>{
+    e.preventDefault();
+    const v=nm.value.replace(/\s+/g,' ').trim();
+    if(v.length<2||!/^[\p{L}\p{M}\p{N} .'-]+$/u.test(v)){
+      $('#nerr').textContent='Use 2–24 letters, numbers, spaces, dots, hyphens or apostrophes.';$('#nerr').classList.add('err');shake(nm);return;}
+    if(!player||player.name.toLowerCase()!==v.toLowerCase())player={id:newId(),name:v}; // a new name starts a fresh run
+    else player.name=v;
+    store.set('posh-player',player);loadScores();map();
+  };
+}
+
+/* ---------- leaderboard ---------- */
+async function leaderboard(highlight){
+  window.scrollTo(0,0);
+  app.innerHTML=`<div class="hud"><button class="back" onclick="${player?'map()':'nameScreen()'}">← Back</button><span class="pill">🏆 Leaderboard</span></div>
+    <div class="card"><div class="lvtitle">Top players</div><div class="lvhelp" id="lbnote">Loading…</div><ol class="board" id="lb"></ol></div>`;
+  const j=await boardTop();
+  $('#lbnote').textContent=sharedBoard?'Best total score per player, out of 600. Finish all six levels to get on the board.':'The online leaderboard is not reachable, so this shows scores on this device only.';
+  const medal=['🥇','🥈','🥉'];
+  const rows=j.entries.map(e=>`<li class="${e.me?'me':''}"><span class="rk">${medal[e.rank-1]||e.rank}</span><span class="nm">${esc(e.name)}${e.me?' <em>(you)</em>':''}</span><span class="sc">★ ${e.stars} · <b>${e.score}</b></span></li>`);
+  if(j.me&&!j.entries.some(e=>e.me))rows.push(`<li class="gap">⋯</li><li class="me"><span class="rk">${j.me.rank}</span><span class="nm">${esc(j.me.name)} <em>(you)</em></span><span class="sc">★ ${j.me.stars} · <b>${j.me.score}</b></span></li>`);
+  $('#lb').innerHTML=rows.length?rows.join(''):'<li class="empty">No scores yet. Be the first!</li>';
+}
+
+function header(i){
+  return `<div class="hud"><button class="back" onclick="map()">← Levels</button><span class="pill">Level ${i+1} / ${LEVELS.length}</span></div>`;
+}
+
+/* ---------- map ---------- */
+function map(){
+  const total=scores.reduce((a,b)=>a+(b||0),0), stars=scores.reduce((a,b)=>a+starsOf(b||0),0);
+  const nextIdx=scores.findIndex(s=>s===null);
+  app.innerHTML=`
+   <div class="playerbar"><span>👤 <b>${esc(player.name)}</b> <button class="link" onclick="nameScreen()">change</button></span><button class="link" onclick="leaderboard()">🏆 Leaderboard</button></div>
+   <div class="hero"><div class="badge">P</div><h1>POSH Smart Check</h1>
+   <p>Six quick levels on preventing sexual harassment at the workplace, based on the POSH Act, 2013 and NIMI's POSH guidelines.</p>
+   <div class="total"><span class="pill">★ ${stars} / 18</span><span class="pill">${total} pts</span></div></div>
+   <div class="map">${LEVELS.map((L,i)=>{
+     const locked=i>0&&scores[i-1]===null&&scores[i]===null;
+     const s=scores[i];
+     return `<button class="tile ${i===nextIdx?'next':''}" ${locked?'disabled':''} onclick="play(${i})">
+       <div class="ic">${locked?'🔒':L.icon}</div>
+       <div class="tx"><b>${i+1}. ${L.name}</b><small>${L.sub}</small></div>
+       <div class="st">${s===null?'':starStr(starsOf(s))}</div></button>`;}).join('')}
+   </div>
+   ${nextIdx===-1?`<button class="btn accent" onclick="finale()">See final result</button>`:''}
+   ${scores.some(s=>s!==null)?`<button class="btn ghost" onclick="scores=Array(${LEVELS.length}).fill(null);save();map()">Reset progress</button>`:''}
+   <div class="foot">Tip: drag with your finger or mouse — or tap a card, then tap where it goes.<br><a href="https://rivubasu.com/games-2/">← More learning games on rivubasu.com</a></div>`;
+}
+function play(i){window.scrollTo(0,0);({sort:lvSort,chat:lvChat,ic:lvIC,order:lvOrder,match:lvMatch,quick:lvQuick})[LEVELS[i].id](i);}
+
+function finish(i,score,learn){
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  scores[i]=Math.max(score,scores[i]??0);save();
+  const st=starsOf(score);if(st===3)confetti();
+  const last=i===LEVELS.length-1;
+  app.innerHTML=`${header(i)}<div class="card result">
+    <span class="lvtag">${LEVELS[i].name} complete</span>
+    <div class="stars">${starStr(st)}</div>
+    <div class="big">${score}</div><div style="color:var(--muted);font-size:13px;font-weight:600">points</div>
+    ${learn?.length?`<div class="learn">${learn.map(l=>`<div>${l}</div>`).join('')}</div>`:''}
+    <button class="btn accent" onclick="${last?'finale()':`play(${i+1})`}">${last?'See final result →':'Next level →'}</button>
+    <button class="btn ghost" onclick="play(${i})">Replay level</button>
+  </div>`;
+}
+
+/* ---------- Level 1: drag sort ---------- */
+const SORT=[
+ {t:"Comments about a colleague's body or the way her clothes fit",y:1,e:"Sexually coloured remarks about a person's clothing or body.",r:"§3.1"},
+ {t:"Forwarding sexual jokes and memes to the office WhatsApp group",y:1,e:"Sexual jokes or offensive pictures by email, SMS, MMS etc. count.",r:"§3.1"},
+ {t:"Asking her out again and again after she has said no",y:1,e:"Repeatedly asking to socialise off-duty against a person's wishes.",r:"§3.1"},
+ {t:"Hinting a promotion is easier if she ‘is nice’ to him",y:1,e:"Implied promise of preferential treatment linked to sexual conduct.",r:"§3.2"},
+ {t:"Persistently following her and messaging her late at night",y:1,e:"Persistent watching, following or contacting a person.",r:"§3.1"},
+ {t:"Leaving a sexually suggestive ‘gift’ on her desk",y:1,e:"Giving gifts or leaving objects that are sexually suggestive.",r:"§3.1"},
+ {t:"A manager giving firm feedback on a late report",y:0,e:"Performance feedback with no sexual nature isn't sexual harassment.",r:"§3.1 — conduct must be of a sexual nature"},
+ {t:"Praising a colleague's presentation in a team meeting",y:0,e:"A professional, non-sexual compliment is fine.",r:""},
+ {t:"Setting the same strict deadline for the whole team",y:0,e:"Workload decisions with nothing sexual about them aren't covered by POSH.",r:""},
+];
+function lvSort(i){
+  const items=shuffle(SORT);let wrong=0,placed=0;const firstTry=new Set(items.map((_,k)=>k));
+  app.innerHTML=`${header(i)}<div class="card" id="lv">
+   <span class="lvtag">Level 1 · Spot It</span><div class="lvtitle">Is it sexual harassment?</div>
+   <div class="lvhelp">Drag each card into a bin (or tap a card, then tap a bin).</div>
+   <div class="bins"><div class="bin yes" data-zone="1"><h4>🚫 Sexual harassment</h4><div class="n">0</div></div><div class="bin no" data-zone="0"><h4>✅ Not harassment</h4><div class="n">0</div></div></div>
+   <div class="pool" id="pool">${items.map((x,k)=>`<div class="chip" data-card data-k="${k}">${x.t}</div>`).join('')}</div>
+   <div class="counter" id="cnt">${items.length} cards left</div></div>`;
+  dnd($('#lv'),(card,zone)=>{
+    const k=+card.dataset.k,x=items[k];
+    if(+zone.dataset.zone===x.y){
+      card.remove();placed++;const n=zone.querySelector('.n');n.textContent=+n.textContent+1;zone.classList.remove('flash');void zone.offsetWidth;zone.classList.add('flash');pop('✓');
+      toast(true,'Correct!',x.e,x.r&&'NIMI Guidelines '+x.r);
+      $('#cnt').textContent=placed===items.length?'All sorted!':`${items.length-placed} cards left`;
+      if(placed===items.length)setTimeout(()=>finish(i,100-wrong*12,["Harassment can be physical, verbal, non-verbal or online. It also includes threats or promises about someone's job that are tied to sexual conduct (NIMI Guidelines §3.1–3.2)."]),900);
+    }else{wrong++;firstTry.delete(k);shake(card);toast(false,'Not quite — try the other bin.',x.y?'Think about whether it is unwelcome and sexual in nature.':'Is there anything sexual about this behaviour?');}
+  });
+}
+
+/* ---------- Level 2: chat red flags ---------- */
+const CHAT=[
+ {me:0,t:"Hi Neha, please share the training schedule by 4 pm.",red:0},
+ {me:0,t:"That dress really shows off your figure 😉",red:1,e:"Remark about her clothing/body (§3.1)"},
+ {me:1,t:"Sir, please keep it professional."},
+ {me:0,t:"Team meeting moved to 11 am tomorrow.",red:0},
+ {me:1,t:"I'm not comfortable going out for dinner with you."},
+ {me:0,t:"Why do you keep saying no? I'll keep asking till you agree.",red:1,e:"Repeated requests to socialise after a clear no (§3.1)"},
+ {me:0,t:"Your appraisal is next week. Be nice to me and it'll go well.",red:1,e:"Implied promise/threat about her job (§3.2)"},
+ {me:0,t:"Good job on yesterday's session, the trainees loved it.",red:0},
+ {me:0,t:"Left a little gift on your desk 🎁 — wear it for me tomorrow.",red:1,e:"Sexually suggestive gift (§3.1)"},
+];
+function lvChat(i){
+  app.innerHTML=`${header(i)}<div class="card">
+   <span class="lvtag">Level 2 · Red Flags</span><div class="lvtitle">Neha shows you this chat with her team lead.</div>
+   <div class="lvhelp">Tap every message from him that's sexual harassment. Tap again to un-flag.</div>
+   <div class="phone"><div class="who">💬 Team Lead (Vikas)</div>
+   ${CHAT.map((m,k)=>`<div class="msg ${m.me?'me':'them'}" data-k="${k}">${m.t}</div>`).join('')}</div>
+   <div class="counter" id="cnt">0 flagged</div>
+   <button class="btn accent" id="chk">Check my flags</button></div>`;
+  const flags=new Set();
+  document.querySelectorAll('.msg.them').forEach(el=>el.onclick=()=>{
+    if(el.dataset.done)return;const k=+el.dataset.k;
+    flags.has(k)?flags.delete(k):flags.add(k);el.classList.toggle('flagged');
+    $('#cnt').textContent=flags.size+' flagged';
+  });
+  $('#chk').onclick=()=>{
+    let hit=0,fp=0;const total=CHAT.filter(m=>m.red).length;
+    document.querySelectorAll('.msg.them').forEach(el=>{
+      const k=+el.dataset.k,m=CHAT[k];el.dataset.done=1;el.classList.remove('flagged');el.style.cursor='default';
+      if(m.red&&flags.has(k)){hit++;el.classList.add('res-hit');el.insertAdjacentHTML('beforeend',`<span class="why">✓ ${m.e}</span>`);}
+      else if(m.red){el.classList.add('res-miss');el.insertAdjacentHTML('beforeend',`<span class="why">Missed: ${m.e}</span>`);}
+      else if(flags.has(k)){fp++;el.classList.add('res-false');el.insertAdjacentHTML('beforeend',`<span class="why">Normal work message</span>`);}
+    });
+    const score=(hit-fp)/total*100;
+    $('#cnt').textContent=`${hit}/${total} red flags found${fp?` · ${fp} false flag${fp>1?'s':''}`:''}`;
+    const b=$('#chk');b.textContent='Continue →';
+    b.onclick=()=>finish(i,score,["Neha can complain in writing to the Internal Committee within 3 months of the last incident. She can attach this chat as evidence (§5.1.1)."]);
+  };
+}
+
+/* ---------- Level 3: build the committee ---------- */
+const PEOPLE=[
+ {n:"Ms. Kavita",d:"Senior Deputy Director",ok:['po']},
+ {n:"Ms. Anjali",d:"Admin officer with a law degree",ok:['emp']},
+ {n:"Mr. Sameer",d:"Trainer, volunteers with a women's rights group",ok:['emp']},
+ {n:"Ms. Fatima",d:"Works at an NGO for women's safety",ok:['ext']},
+ {n:"Mr. Mohan",d:"Senior Director, no POSH or legal background",ok:[]},
+ {n:"Mr. Ravi",d:"Joined last month, no relevant experience",ok:[]},
+];
+const SLOTS=[{k:'po',l:'Presiding Officer'},{k:'emp',l:'Employee member'},{k:'emp',l:'Employee member'},{k:'ext',l:'External member'}];
+function why(p,slot){
+  if(slot==='po')return p.n.startsWith('Ms.')?"The Presiding Officer must be a woman at a senior level — this person isn't senior.":"The Presiding Officer must be a woman employed at a senior level.";
+  if(slot==='ext')return "The external member comes from an NGO/association committed to women's causes, or is familiar with sexual harassment issues.";
+  if(p.ok.includes('po'))return "Good choice for the committee — but she fits a more important seat.";
+  if(p.ok.includes('ext'))return "She's from outside the organisation — she fits a different seat.";
+  return "Employee members should be committed to the cause of women, or have social work or legal experience.";
+}
+function lvIC(i){
+  let wrong=0,filled=0;const ppl=shuffle(PEOPLE.map((p,k)=>({...p,k})));
+  app.innerHTML=`${header(i)}<div class="card" id="lv">
+   <span class="lvtag">Level 3 · Build the Committee</span><div class="lvtitle">Seat a valid Internal Committee.</div>
+   <div class="lvhelp">Drag each person into the seat they qualify for. Two candidates don't belong on the committee.</div>
+   <div class="slots">${SLOTS.map((s,k)=>`<div class="slot" data-zone="${s.k}" data-s="${k}"><h5>${s.l}</h5></div>`).join('')}</div>
+   <div class="pool">${ppl.map(p=>`<div class="chip person" data-card data-k="${p.k}"><b>${p.n}</b><span>${p.d}</span></div>`).join('')}</div></div>`;
+  dnd($('#lv'),(card,zone)=>{
+    const p=PEOPLE[+card.dataset.k],slot=zone.dataset.zone;
+    if(zone.classList.contains('filled')){toast(false,'Seat taken','Pick an empty seat.');return;}
+    if(p.ok.includes(slot)){
+      card.classList.add('locked');zone.appendChild(card);zone.classList.add('filled');filled++;pop('✓');
+      toast(true,'Seated!',slot==='po'?'A senior woman employee presides.':slot==='ext'?'One member comes from outside the organisation.':'Committed to women\'s causes, or has legal/social-work experience.','NIMI Guidelines §4.1');
+      if(filled===4)setTimeout(()=>finish(i,100-wrong*15,["The Internal Committee has a senior woman as Presiding Officer, at least 2 employee members and 1 external member. At least half the members must be women, and each serves for up to 3 years (§4.1–4.2)."]),900);
+    }else{wrong++;shake(card);toast(false,"Doesn't fit here",why(p,slot),'NIMI Guidelines §4.1');}
+  });
+}
+
+/* ---------- Level 4: order ---------- */
+const STEPS=[
+ {t:"Incident happens",s:""},
+ {t:"Written complaint to the Internal Committee",s:"within 3 months"},
+ {t:"Committee sends a copy to the respondent",s:"within 5 working days"},
+ {t:"Respondent replies with documents",s:"within 7 working days"},
+ {t:"Inquiry following natural justice",s:"completed within 90 days"},
+ {t:"Findings report sent to the employer",s:"within 10 days of the inquiry"},
+ {t:"Employer acts; either side may appeal",s:"appeal within 90 days"},
+];
+function lvOrder(i){
+  let tries=0;
+  let order=shuffle(STEPS.map((_,k)=>k));
+  if(order.every((v,k)=>v===k))order.reverse();
+  app.innerHTML=`${header(i)}<div class="card">
+   <span class="lvtag">Level 4 · Complaint Journey</span><div class="lvtitle">Put the complaint process in order.</div>
+   <div class="lvhelp">Drag the steps up or down, then check your order.</div>
+   <ul class="olist" id="ol">${order.map(k=>`<li data-k="${k}"><div>${STEPS[k].t}<small>${STEPS[k].s}</small></div><span class="h">⋮⋮</span></li>`).join('')}</ul>
+   <button class="btn accent" id="chk">Check order</button></div>`;
+  const ol=$('#ol');
+  ol.querySelectorAll('li').forEach(li=>li.addEventListener('pointerdown',e=>{
+    e.preventDefault();li.classList.add('dragging');ol.querySelectorAll('li').forEach(x=>x.classList.remove('good','badpos'));
+    const move=ev=>{edge(ev.clientY);const t=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('li');
+      if(t&&t!==li&&t.parentNode===ol){const r=t.getBoundingClientRect();ol.insertBefore(li,ev.clientY<r.top+r.height/2?t:t.nextSibling);}};
+    const up=()=>{li.classList.remove('dragging');window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);};
+    window.addEventListener('pointermove',move);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+  }));
+  $('#chk').onclick=()=>{
+    tries++;let right=0;
+    [...ol.children].forEach((li,pos)=>{const g=+li.dataset.k===pos;li.classList.add(g?'good':'badpos');if(g)right++;});
+    if(right===STEPS.length){pop('✓');toast(true,'Perfect order!','');
+      setTimeout(()=>finish(i,[100,75,55,40][Math.min(tries-1,3)],["Before an inquiry, the complainant can ask for conciliation — but never a money settlement (§5.3).","No lawyers can represent either party, and at least 3 members including the Presiding Officer must be present (§5.5)."]),900);}
+    else toast(false,`${right} of ${STEPS.length} in the right place`,'Green steps are correct. Move the red ones and check again.');
+  };
+}
+
+/* ---------- Level 5: match ---------- */
+const PAIRS=[
+ ["File a complaint after the (last) incident","3 months"],
+ ["Committee sends complaint copy to respondent","5 working days"],
+ ["Respondent submits a reply","7 working days"],
+ ["Complete the inquiry","90 days"],
+ ["Send inquiry report to the employer","10 days"],
+ ["Maximum term of a Committee member","3 years"],
+];
+function lvMatch(i){
+  let wrong=0,done=0,selL=null,selR=null;
+  const L=shuffle(PAIRS.map((p,k)=>k)),R=shuffle(PAIRS.map((p,k)=>k));
+  const colors=['#dcefe6','#dde8f3','#f8ecd2','#f6dfe2','#e8e0f3','#e0f0f0'];
+  app.innerHTML=`${header(i)}<div class="card">
+   <span class="lvtag">Level 5 · Beat the Clock</span><div class="lvtitle">Match each step to its time limit.</div>
+   <div class="lvhelp">Tap a step, then tap its deadline.</div>
+   <div class="match"><div class="col l">${L.map(k=>`<button class="mbtn" data-side="l" data-k="${k}">${PAIRS[k][0]}</button>`).join('')}</div>
+   <div class="col r">${R.map(k=>`<button class="mbtn" data-side="r" data-k="${k}">${PAIRS[k][1]}</button>`).join('')}</div></div>
+   <div class="counter" id="cnt">0 / ${PAIRS.length} matched</div></div>`;
+  document.querySelectorAll('.mbtn').forEach(b=>b.onclick=()=>{
+    if(b.classList.contains('done'))return;
+    if(b.dataset.side==='l'){selL?.classList.remove('sel');selL=b;}else{selR?.classList.remove('sel');selR=b;}
+    b.classList.add('sel');
+    if(selL&&selR){
+      const a=selL,c=selR;selL=selR=null;
+      if(a.dataset.k===c.dataset.k){
+        const col=colors[done%colors.length];[a,c].forEach(x=>{x.classList.remove('sel');x.classList.add('done');x.style.background=col;});
+        done++;pop('✓');$('#cnt').textContent=`${done} / ${PAIRS.length} matched`;
+        if(done===PAIRS.length)setTimeout(()=>finish(i,100-wrong*12,["The time limits keep the process quick and fair: 3 months to complain, 90 days for the inquiry, then 10 days for the report (§5.1, §5.5, §5.8)."]),800);
+      }else{wrong++;[a,c].forEach(x=>{x.classList.remove('sel');shake(x);});toast(false,'Not a match','Try another pairing.');}
+    }
+  });
+}
+
+/* ---------- Level 6: quick fire ---------- */
+const QUICK=[
+ {q:"A colleague confides that a senior is harassing her. You're not on the Committee. You…",
+  o:["Keep it to yourself","Warn your team about him","Report it to the Internal Committee right away and keep it confidential","Confront the senior yourself"],a:2,
+  e:"Whoever receives a complaint must report it to the Committee immediately and keep it completely confidential.",r:"§5.1.4–5.1.5"},
+ {q:"The respondent wants his lawyer to argue his case at the inquiry.",
+  o:["Allowed","Allowed if she agrees","Not allowed at any stage","Only for senior staff"],a:2,
+  e:"No legal practitioner can represent any party at any stage of the inquiry.",r:"§5.5.4"},
+ {q:"During the inquiry, the respondent still rates her work. She asks for help in writing. The Committee can recommend…",
+  o:["Nothing until it ends","Stopping him from assessing her work, a transfer, or up to 3 months' extra leave","Suspending her","Closing the case"],a:1,
+  e:"Interim relief can include a transfer, up to 3 months' extra leave, and stopping the respondent from assessing her work.",r:"§5.6"},
+ {q:"She can't put the complaint in writing herself. What happens?",
+  o:["The complaint can't proceed","Committee members help her write it — or, with her written consent, a relative, friend or co-worker can file it","Only her manager can file it","She must hire a lawyer"],a:1,
+  e:"The Committee gives all reasonable help to write it. If she can't file it herself, someone else can file it with her written consent.",r:"§5.1.2–5.1.3"},
+ {q:"The Committee finds the allegation was knowingly false and backed by forged documents. It may…",
+  o:["Do nothing","Recommend action against the person who made the false complaint","Make the complaint public","Penalise the witnesses automatically"],a:1,
+  e:"For a malicious or knowingly false complaint, the Committee may recommend action against the complainant. A complaint that simply can't be proved is not a false one.",r:"§5.9"},
+];
+function lvQuick(i){
+  const SEC=15;let n=0,pts=0,raf,t0,locked;const qs=QUICK;
+  const show=()=>{
+    locked=false;const x=qs[n];
+    app.innerHTML=`${header(i)}<div class="card">
+     <span class="lvtag">Level 6 · Final Call · ${n+1}/${qs.length}</span>
+     <div class="q">${x.q}</div><div class="timer"><i id="tm"></i></div>
+     <div class="opts">${x.o.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join('')}</div>
+     <div id="fb"></div></div>`;
+    document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>ans(+b.dataset.k));
+    t0=performance.now();tick();
+  };
+  const tick=()=>{const left=Math.max(0,1-(performance.now()-t0)/(SEC*1000));const tm=$('#tm');if(tm)tm.style.width=left*100+'%';if(left<=0)return ans(-1);raf=requestAnimationFrame(tick);};
+  const ans=k=>{
+    if(locked)return;locked=true;cancelAnimationFrame(raf);const x=qs[n],ok=k===x.a;
+    const secs=(performance.now()-t0)/1000;
+    document.querySelectorAll('.opt').forEach(b=>{const m=+b.dataset.k;b.disabled=true;b.classList.add(m===x.a?'right':m===k?'wrong':'dim');});
+    if(ok){const g=Math.round(14+6*Math.max(0,1-secs/SEC));pts+=g;pop('+'+g);}
+    $('#fb').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'Correct!':k===-1?'Time\'s up.':'Not quite.'}</b> ${x.e}<span class="ref">NIMI Guidelines ${x.r}</span></div>
+      <button class="btn" id="nx">${n<qs.length-1?'Next →':'Finish level →'}</button>`;
+    $('#nx').onclick=()=>{n++;n<qs.length?show():finish(i,pts,["Complaints can also be filed online through the Government's SHe-Box portal (Annexure 2)."]);};
+  };
+  show();
+}
+
+/* ---------- finale ---------- */
+async function finale(){
+  const total=scores.reduce((a,b)=>a+(b||0),0),stars=scores.reduce((a,b)=>a+starsOf(b||0),0);
+  const rank=stars>=16?'POSH Champion 🏆':stars>=12?'Safe-Workplace Ally 🛡️':stars>=8?'Getting There 📘':'Needs a Refresher 🔁';
+  if(stars>=12)confetti();
+  app.innerHTML=`<div class="card result">
+    <span class="lvtag">All levels complete</span>
+    <div class="lvtitle" style="color:var(--accent);margin:6px 0 10px">${rank}</div>
+    <div class="big">${total}</div><div style="color:var(--muted);font-size:13px;font-weight:600">of 600 points · ★ ${stars} / 18</div>
+    <div class="learn">${LEVELS.map((L,k)=>`<div style="display:flex;justify-content:space-between;border-left-color:var(--gold)"><span>${L.icon} ${L.name}</span><span style="color:var(--gold)">${starStr(starsOf(scores[k]||0))}</span></div>`).join('')}</div>
+    <div class="rankline" id="rl">Saving your score to the leaderboard…</div>
+    <button class="btn accent" onclick="leaderboard()">🏆 See the leaderboard</button>
+    <button class="btn ghost" onclick="map()">Replay levels to improve</button>
+    <button class="btn ghost" onclick="scores=Array(${LEVELS.length}).fill(null);save();map()">Play again from scratch</button>
+  </div>
+  <div class="foot">Need to report? Write to the Internal Committee or use the SHe-Box portal. Every complaint is handled confidentially and without fear of reprisal.</div>`;
+  const r=await boardSubmit();const rl=$('#rl');if(!rl)return;
+  rl.innerHTML=r.ok?`${esc(player.name)}, you're <b>#${r.rank}</b> on the ${sharedBoard?'leaderboard':'leaderboard on this device'}`+(r.best>total?` (your best is ${r.best})`:'')+'.':'Couldn\'t save your score just now.';
+}
+player?map():nameScreen();
+</script>
+</body>
+</html>
