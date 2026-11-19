@@ -1,9 +1,9 @@
-
+<!-- wp:html -->
 <style id="phfy-contact-style">
-.phfy-contact-page{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324a;background:linear-gradient(180deg,#f3f8fd 0%,#fff 46%,#eef7ff 100%);padding:0 0 3rem;margin:0 calc(50% - 50vw);width:100vw;}
+.phfy-contact-page{font-family:inherit;color:inherit}
 .phfy-contact-page *{box-sizing:border-box;}
-.phfy-contact-wrap{max-width:1120px;margin:0 auto;padding:clamp(1rem,3vw,2rem);}
-.phfy-contact-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:clamp(1.2rem,4vw,3rem);align-items:center;padding:clamp(2rem,6vw,4.6rem) 0 1.5rem;}
+.phfy-contact-wrap{max-width:1200px;margin:0 auto;padding:0}
+.phfy-contact-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:clamp(1.2rem,4vw,3rem);align-items:center;padding:0 0 1.5rem;}
 .phfy-contact-kicker{display:inline-flex;align-items:center;gap:.45rem;background:#dff0ff;color:#0b558a;border:1px solid #b9def7;border-radius:999px;padding:.45rem .8rem;font-size:.86rem;font-weight:800;letter-spacing:.02em;text-transform:uppercase;}
 .phfy-contact-hero h1{font-size:clamp(2.25rem,6vw,4.8rem);line-height:1.02;margin:.85rem 0 1rem;color:#082f52;letter-spacing:0;}
 .phfy-contact-hero p{font-size:clamp(1.03rem,2vw,1.22rem);line-height:1.75;margin:0;color:#2f526e;max-width:68ch;}
@@ -29,6 +29,9 @@
 .phfy-form-card button[type=submit],.phfy-form-card .wpforms-submit{background:#1769aa!important;color:#fff!important;border:0!important;border-radius:8px!important;padding:.85rem 1.25rem!important;font-weight:900!important;box-shadow:0 12px 26px rgba(23,105,170,.22)!important;}
 .phfy-form-card button[type=submit]:hover,.phfy-form-card .wpforms-submit:hover{background:#0b3d66!important;}
 @media (max-width:820px){.phfy-contact-hero,.phfy-contact-grid{grid-template-columns:1fr;}.phfy-contact-hero{padding-top:2rem;}.phfy-contact-page{margin:0 calc(50% - 50vw);}.phfy-contact-links a{align-items:flex-start;flex-direction:column;}.phfy-contact-step{grid-template-columns:1.9rem minmax(0,1fr);}.phfy-contact-step strong{width:1.9rem;height:1.9rem;}}
+.phfy-contact-hero .phfy-contact-title{font-size:clamp(1.6rem,3vw,2.3rem);line-height:1.15;margin:.8rem 0 .9rem;color:#0e1f33}
+.phfy-contact-kicker{background:#e8f1fa!important;color:#0f4f84!important;border-color:#cfe1f2!important}
+.phfy-contact-step strong{background:#1769aa!important}
 </style>
 <style id="phfy-contact-captcha-style">
 .phfy-captcha-check{margin:1rem 0 1.1rem;padding:1rem;border:1px solid #b9def7;background:#f2f9ff;border-radius:8px;color:#244962;}
@@ -47,7 +50,7 @@
     <section class="phfy-contact-hero">
       <div>
         <span class="phfy-contact-kicker">Contact Rivu Basu</span>
-        <h1>Ask a public health query</h1>
+        <h2 class="phfy-contact-title">Ask a public health query</h2>
         <p>Use this page to send questions about the site, tools, public health education material, epidemiology, biostatistics, nutrition calculators, games, or collaborations. Please include a working email address so the reply can reach you safely.</p>
       </div>
       <aside class="phfy-contact-panel">
@@ -56,7 +59,7 @@
         <div class="phfy-contact-steps">
           <div class="phfy-contact-step"><strong>1</strong><span>Enter your name, email address, and question with enough context for a useful reply.</span></div>
           <div class="phfy-contact-step"><strong>2</strong><span>The query is sent to the site owner for review and response.</span></div>
-          <div class="phfy-contact-step"><strong>3</strong><span>Email OTP verification can be enabled after an OTP-capable form add-on or custom backend is connected.</span></div>
+          <div class="phfy-contact-step"><strong>3</strong><span>You will receive a reply at the email address you provided, usually within a few working days.</span></div>
         </div>
       </aside>
     </section>
@@ -110,3 +113,4 @@
   });
 })();
 </script>
+<!-- /wp:html -->

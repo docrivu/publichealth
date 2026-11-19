@@ -5,7 +5,7 @@
     "title": "Contact",
     "link": "https://rivubasu.com/contact/",
     "status": "publish",
-    "modified": "2026-06-12T11:42:50",
+    "modified": "2026-11-16T11:16:29",
     "file": "pages/contact.html"
   },
   {
@@ -14,7 +14,7 @@
     "title": "Extreme Weather Events",
     "link": "https://rivubasu.com/ewe/",
     "status": "publish",
-    "modified": "2026-06-13T12:04:38",
+    "modified": "2026-11-16T09:11:48",
     "file": "pages/ewe.html"
   },
   {
@@ -23,7 +23,7 @@
     "title": "Public Education Materials",
     "link": "https://rivubasu.com/public-education-materials/",
     "status": "publish",
-    "modified": "2026-06-13T11:50:47",
+    "modified": "2026-11-16T09:06:03",
     "file": "pages/public-education-materials.html"
   },
   {
@@ -32,8 +32,26 @@
     "title": "Learning Biostats",
     "link": "https://rivubasu.com/learning-epidemiology-and-biostats/",
     "status": "publish",
-    "modified": "2026-06-13T11:50:48",
+    "modified": "2026-11-16T09:05:48",
     "file": "pages/learning-epidemiology-and-biostats.html"
+  },
+  {
+    "id": 316,
+    "slug": "food-groups-table",
+    "title": "Food Groups Table",
+    "link": "https://rivubasu.com/food-groups-table/",
+    "status": "publish",
+    "modified": "2026-11-16T09:07:17",
+    "file": "pages/food-groups-table.html"
+  },
+  {
+    "id": 323,
+    "slug": "home",
+    "title": "Public Health for You",
+    "link": "https://rivubasu.com/",
+    "status": "publish",
+    "modified": "2026-11-16T09:08:01",
+    "file": "pages/home.html"
   },
   {
     "id": 80,
@@ -41,7 +59,7 @@
     "title": "Epidemiology Game",
     "link": "https://rivubasu.com/games/",
     "status": "publish",
-    "modified": "2026-06-12T10:53:36",
+    "modified": "2026-11-16T11:16:31",
     "file": "pages/games.html"
   },
   {
@@ -50,7 +68,7 @@
     "title": "Waste Sorting Game",
     "link": "https://rivubasu.com/waste-sorting-game/",
     "status": "publish",
-    "modified": "2026-06-12T10:53:35",
+    "modified": "2026-11-16T11:16:32",
     "file": "pages/waste-sorting-game.html"
   },
   {
@@ -59,16 +77,16 @@
     "title": "Stats Calculator",
     "link": "https://rivubasu.com/stats-calculator/",
     "status": "publish",
-    "modified": "2026-06-12T11:29:52",
+    "modified": "2026-11-16T09:07:24",
     "file": "pages/stats-calculator.html"
   },
   {
     "id": 90,
     "slug": "games-2",
-    "title": "Games",
+    "title": "Learning Games",
     "link": "https://rivubasu.com/games-2/",
     "status": "publish",
-    "modified": "2026-06-13T11:50:48",
+    "modified": "2026-11-16T09:08:01",
     "file": "pages/games-2.html"
   },
   {
@@ -77,7 +95,7 @@
     "title": "Sample Size Calculator",
     "link": "https://rivubasu.com/sample-size-calculator/",
     "status": "publish",
-    "modified": "2026-06-12T11:29:53",
+    "modified": "2026-11-16T09:07:13",
     "file": "pages/sample-size-calculator.html"
   },
   {
@@ -86,7 +104,7 @@
     "title": "Nutrient Tool",
     "link": "https://rivubasu.com/nutrient-calculator/",
     "status": "publish",
-    "modified": "2026-06-12T11:29:54",
+    "modified": "2026-11-16T09:07:14",
     "file": "pages/nutrient-calculator.html"
   },
   {
@@ -95,7 +113,7 @@
     "title": "Calculators",
     "link": "https://rivubasu.com/calculator/",
     "status": "publish",
-    "modified": "2026-06-13T11:50:46",
+    "modified": "2026-11-16T09:05:43",
     "file": "pages/calculator.html"
   },
   {
@@ -104,7 +122,7 @@
     "title": "Statistics Simulation Lab",
     "link": "https://rivubasu.com/statistics-simulation-lab/",
     "status": "publish",
-    "modified": "2026-06-13T11:50:49",
+    "modified": "2026-11-16T09:05:44",
     "file": "pages/statistics-simulation-lab.html"
   },
   {
@@ -113,7 +131,7 @@
     "title": "Operations Research",
     "link": "https://rivubasu.com/operations-research/",
     "status": "publish",
-    "modified": "2026-06-13T11:50:49",
+    "modified": "2026-11-16T09:05:45",
     "file": "pages/operations-research.html"
   },
   {
@@ -122,7 +140,7 @@
     "title": "Infectious Disease Modeling",
     "link": "https://rivubasu.com/infectious-disease-modeling/",
     "status": "publish",
-    "modified": "2026-06-13T11:50:49",
+    "modified": "2026-11-16T09:05:46",
     "file": "pages/infectious-disease-modeling.html"
   },
   {
@@ -131,25 +149,7 @@
     "title": "RDA Calculator",
     "link": "https://rivubasu.com/rda-calculator/",
     "status": "publish",
-    "modified": "2026-06-12T11:28:50",
+    "modified": "2026-11-16T09:07:15",
     "file": "pages/rda-calculator.html"
-  },
-  {
-    "id": 233,
-    "slug": "anthropac",
-    "title": "Anthropac",
-    "link": "https://rivubasu.com/anthropac/",
-    "status": "publish",
-    "modified": "2026-06-13T06:07:22",
-    "file": "pages/anthropac.html"
-  },
-  {
-    "id": 234,
-    "slug": "growth-chart",
-    "title": "Growth Chart",
-    "link": "https://rivubasu.com/growth-chart/",
-    "status": "publish",
-    "modified": "2026-06-12T11:28:51",
-    "file": "pages/growth-chart.html"
   }
 ]
