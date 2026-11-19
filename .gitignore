@@ -7,3 +7,6 @@ public_html/uploads/*
 !public_html/uploads/.htaccess
 public_html/storage/*
 public_html/bht/storage/*
+
+# POSH game leaderboard data (lives only on the server)
+public_html/tools/posh-data/leaderboard.json
