@@ -56,7 +56,12 @@ async function main() {
       if (existsSync(previousPath)) {
         const previous = await readFile(previousPath, "utf8");
         const { data: live } = await wpRequest(config, `/pages/${page.id}?context=edit`);
-        if (normalise(live?.content?.raw) !== normalise(previous)) {
+        const liveRaw = normalise(live?.content?.raw);
+        if (liveRaw === normalise(content)) {
+          console.log(`Already up to date: ${page.slug} (${page.id})`);
+          continue;
+        }
+        if (liveRaw !== normalise(previous)) {
           conflicts.push(page);
           console.error(
             `CONFLICT ${page.slug}: the live page was edited in WordPress after the last sync. ` +
